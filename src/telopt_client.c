@@ -496,6 +496,13 @@ int client_translate_telopts(struct session *ses, unsigned char *src, int cplen)
 							}
 							if (cplen >= 4)
 							{
+								if (cpsrc[2] == '0' && cpsrc[3] == 'c')
+								{
+									check_all_events(ses, SUB_ARG, 0, 0, "VT100 DA");
+									cpsrc += 4;
+									cplen -= 4;
+									continue;
+								}
 								if (cpsrc[2] >= '5' && cpsrc[2] <= '6' && cpsrc[3] == 'n')
 								{
 									if (cpsrc[2] == '5')

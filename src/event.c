@@ -142,7 +142,7 @@ int check_all_events(struct session *ses, int flags, int args, int vars, char *f
 					show_debug(ses_ptr, LIST_EVENT, "#DEBUG EVENT {%s} (%s}", node->arg1, node->arg2);
 				}
 
-				if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+				if (node->shots && --node->shots == 0)
 				{
 					delete_node_list(ses, LIST_EVENT, node);
 				}

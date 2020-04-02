@@ -91,7 +91,7 @@ void dictionary_lowerstring(char *in, char *out)
 
 	while (*pti)
 	{
-		if (isalpha(*pti))
+		if (isalpha((int) *pti))
 		{
 			*pto++ = tolower(*pti++);
 		}
@@ -117,7 +117,7 @@ int spellcheck_count(struct session *ses, char *in)
 
 		dictionary_lowerstring(arg1, arg2);
 
-		if (isalpha(*arg2))
+		if (isalpha((int) *arg2))
 		{
 			hash = *arg2 - 'a';
 
@@ -144,7 +144,7 @@ DO_COMMAND(do_dictionary)
 
 	sub_arg_in_braces(ses, arg, arg1, GET_ALL, SUB_VAR|SUB_FUN);
 
-	if (*arg1 == 0 || !isalpha(*arg1))
+	if (*arg1 == 0 || !isalpha((int) *arg1))
 	{
 		show_message(ses, LIST_COMMAND, "#SYNTAX: #DICTIONARY {WORD}");
 
@@ -159,7 +159,7 @@ DO_COMMAND(do_dictionary)
 
 		dictionary_lowerstring(arg2, arg3);
 
-		if (isalpha(*arg3))
+		if (isalpha((int) *arg3))
 		{
 			hash = *arg3 - 'a';
 

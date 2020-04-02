@@ -762,7 +762,7 @@ void tick_update(void)
 				{
 					show_debug(ses, LIST_TICKER, "#DEBUG TICKER {%s}", node->arg2);
 
-					if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+					if (node->shots && --node->shots == 0)
 					{
 						strcpy(buf, node->arg2);
 

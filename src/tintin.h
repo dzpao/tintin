@@ -164,7 +164,9 @@
 #define STRING_SIZE                  50000
 #define BUFFER_SIZE                  24000
 #define INPUT_SIZE                   10000
+#define PATH_SIZE                     4096
 #define STACK_SIZE                    1000
+#define NAME_SIZE                      256
 #define NUMBER_SIZE                    100
 #define LEGEND_SIZE                     50
 #define COLOR_SIZE                      50
@@ -172,7 +174,7 @@
 #define LIST_SIZE                        2
 
 #define CLIENT_NAME              "TinTin++"
-#define CLIENT_VERSION           "2.02.02 "
+#define CLIENT_VERSION           "2.02.03b"
 
 #define XT_E                            0x27
 #define XT_C                            0x5B
@@ -357,10 +359,12 @@ enum operators
 #define CHARSET_FLAG_ISO1TOUTF8           BV07
 #define CHARSET_FLAG_ISO2TOUTF8           BV08
 #define CHARSET_FLAG_KOI8TOUTF8           BV09
+#define CHARSET_FLAG_CP1251TOUTF8         BV10
+
 
 
 #define CHARSET_FLAG_EUC                  CHARSET_FLAG_BIG5|CHARSET_FLAG_GBK1
-#define CHARSET_FLAG_ALL_TOUTF8           CHARSET_FLAG_BIG5TOUTF8|CHARSET_FLAG_FANSITOUTF8|CHARSET_FLAG_GBK1TOUTF8|CHARSET_FLAG_ISO1TOUTF8|CHARSET_FLAG_ISO2TOUTF8|CHARSET_FLAG_KOI8TOUTF8
+#define CHARSET_FLAG_ALL_TOUTF8           CHARSET_FLAG_BIG5TOUTF8|CHARSET_FLAG_CP1251TOUTF8|CHARSET_FLAG_FANSITOUTF8|CHARSET_FLAG_GBK1TOUTF8|CHARSET_FLAG_ISO1TOUTF8|CHARSET_FLAG_ISO2TOUTF8|CHARSET_FLAG_KOI8TOUTF8
 #define CHARSET_FLAG_ALL                  CHARSET_FLAG_UTF8|CHARSET_FLAG_ALL_TOUTF8|CHARSET_FLAG_EUC
 
 
@@ -573,6 +577,7 @@ enum operators
 #define TINTIN_FLAG_DAEMONIZE         (1 << 12)
 #define TINTIN_FLAG_HIDDENCURSOR      (1 << 13)
 #define TINTIN_FLAG_LOCAL             (1 << 14)
+#define TINTIN_FLAG_PRESERVEMACRO     (1 << 15)
 
 #define SES_FLAG_ECHOCOMMAND          BV01
 #define SES_FLAG_SNOOP                BV02
@@ -1001,7 +1006,7 @@ struct listnode
 	char                  * arg3;
 	char                  * arg4;
 	char                  * group;
-	int                     flags;
+	unsigned int            shots;
 	union
 	{
 		pcre              * regex;      // act, alias, gag, highlight, substitute
@@ -1169,9 +1174,9 @@ struct level_data
 	unsigned int            ignore;
 	unsigned int            info;
 	unsigned int            input;
-	unsigned int            oneshot;
 	unsigned int            quiet;
 	unsigned int            scroll;
+	unsigned int            shots;
 	unsigned int            verbatim;
 	unsigned int            verbose;
 };
@@ -1928,6 +1933,7 @@ extern DO_CURSOR(cursor_insert);
 extern DO_CURSOR(cursor_left);
 extern DO_CURSOR(cursor_left_word);
 extern DO_CURSOR(cursor_paste_buffer);
+extern DO_CURSOR(cursor_preserve_macro);
 extern DO_CURSOR(cursor_redraw_input);
 extern DO_CURSOR(cursor_redraw_line);
 extern DO_CURSOR(cursor_right);
@@ -2474,6 +2480,7 @@ extern DO_PATH(path_create);
 extern DO_PATH(path_describe);
 extern DO_PATH(path_delete);
 extern DO_PATH(path_destroy);
+extern DO_PATH(path_get);
 extern DO_PATH(path_goto);
 extern DO_PATH(path_insert);
 extern DO_PATH(path_load);
@@ -2913,6 +2920,9 @@ extern int utf8_to_big5(char *input, char *output);
 extern int is_gbk1(char *str);
 extern int gbk1_to_utf8(char *input, char *output);
 extern int utf8_to_gbk1(char *input, char *output);
+
+extern int cp1251_to_utf8(char *input, char *output);
+extern int utf8_to_cp1251(char *input, char *output);
 
 #endif
 

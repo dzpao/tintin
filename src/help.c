@@ -37,7 +37,7 @@ struct help_type help_table[];
 char *help_related(struct session *ses, int index, int html)
 {
 	char *arg;
-	char tmp[BUFFER_SIZE], link[BUFFER_SIZE];
+	char tmp[INPUT_SIZE], link[INPUT_SIZE];
 	static char buf[INPUT_SIZE];
 
 	push_call("help_related(%p,%d,%d)",ses,index,html);
@@ -293,11 +293,11 @@ struct help_type help_table[] =
 		"\n"
 		"<178>Example<278>: #action {%1 tells you '%2'} {tell %1 I'm afk.}\n"
 		"\n"
-		"         Actions can be triggered by the showme command and certain system\n"
+		"         Actions can be triggered by the show command and certain system\n"
 		"         messages.\n"
 		"\n"
-		"         Actions can be triggered by the #showme command. If you don't want a\n"
-		"         #showme to get triggered use: #line ignore #showme {text}\n"
+		"         Actions can be triggered by the #show command. If you don't want a\n"
+		"         #show to get triggered use: #line ignore #show {text}\n"
 		"\n"
 		"         Actions are ordered alphabetically and only one action can trigger at\n"
 		"         a time. To change the order you can assign a priority, which defaults\n"
@@ -338,7 +338,7 @@ struct help_type help_table[] =
 		"\n"
 		"         To have an alias that matches all user input, use %* as the name.\n"
 		"\n"
-		"<178>Example<278>: #alias {%*} {#showme You wrote: %0}\n"
+		"<178>Example<278>: #alias {%*} {#show You wrote: %0}\n"
 		"\n"
 		"         Aliases are ordered alphabetically and only one alias can trigger at\n"
 		"         a time. To change the order you can assign a priority, which defaults\n"
@@ -399,7 +399,7 @@ struct help_type help_table[] =
 		"         It's possible to adjust the alarm bell volume on some terminals.\n"
 		"\n"
 		"<178>Example<278>: #loop {1} {8} {cnt} {#line substitute variables\n"
-		"           #delay {$cnt} {#showme Volume $cnt: #bell volume $cnt;#bell}\n",
+		"           #delay {$cnt} {#show Volume $cnt: #bell volume $cnt;#bell}\n",
 
 		"screen"
 	},
@@ -503,7 +503,7 @@ struct help_type help_table[] =
 		"         This command draws no visible button, you'll have to do so separately\n"
 		"         if needed.\n"
 		"\n"
-		"<178>Example<278>: #button {1;1;2;2} {#showme You clicked the upper left corner.}\n"
+		"<178>Example<278>: #button {1;1;2;2} {#show You clicked the upper left corner.}\n"
 		"\n"
 		"         Buttons are ordered alphabetically and only one button can trigger at\n"
 		"         a time. To change the order you can assign a priority, which defaults\n"
@@ -735,8 +735,8 @@ struct help_type help_table[] =
 		"         <<888>caf> - Violet           <<888>cfa> - Lime\n"
 		"         <<888>fac> - Pink             <<888>fca> - Orange\n"
 		"\n"
-		"<178>Example<278>: #showme <<888>acf>Azure    <<888>afc>Jade     <<888>caf>Violet\n"
-		"<178>Example<278>: #showme <<888>cfa>Lime     <<888>fac>Pink     <<888>fca>Orange\n"
+		"<178>Example<278>: #show <<888>acf>Azure    <<888>afc>Jade     <<888>caf>Violet\n"
+		"<178>Example<278>: #show <<888>cfa>Lime     <<888>fac>Pink     <<888>fca>Orange\n"
 		"\n"
 		"         For 12 bit truecolor use <<888>F000> to <<888>FFFF> for foreground colors and\n"
 		"         <<888>B000> to <<888>BFFF> for background colors.\n"
@@ -912,7 +912,7 @@ struct help_type help_table[] =
 		"\n"
 		"         Floating point precision for milliseconds is possible.\n"
 		"\n"
-		"<178>Example<278>: #showme first;#delay {1} {#showme last}\n"
+		"<178>Example<278>: #show first;#delay {1} {#show last}\n"
 		"         This will print 'first', and 'last' around one second later.\n"
 		"\n"
 		"<178>Comment<278>: If you want to remove a delay with the #undelay command you can add\n"
@@ -1005,7 +1005,7 @@ struct help_type help_table[] =
 		"\n"
 		"         The echo command does not trigger actions.\n"
 		"\n"
-		"         As with the #showme command you can split the {format} argument up into\n"
+		"         As with the #show command you can split the {format} argument up into\n"
 		"         two braced arguments, in which case the 2nd argument is the row number.\n"
 		"\n"
 		"<178>Example<278>: #echo {The current date is %t.} {%Y-%m-%d %H:%M:%S}\n"
@@ -1105,6 +1105,7 @@ struct help_type help_table[] =
 		"         IAC SB NEW-ENVIRON     %0 variable %1 value\n"
 		"         IAC SB ZMP <VAR>       %0 value\n"
 		"         IAC SB <VAR>           %0 raw text %1 raw data\n"
+		"         KEYPRESS               %0 character %1 unicode index\n"
 		"         LONG-CLICKED <VAR>     %0 row %1 col %2 -row %3 -col %4 word %5 line\n"
 		"         MAP ENTER MAP          %0 new vnum\n"
 		"         MAP ENTER ROOM         %0 new vnum %1 old vnum\n"
@@ -1268,10 +1269,10 @@ struct help_type help_table[] =
 		"         in %1 to %9, with %0 holding all arguments.\n"
 		"\n"
 		"<178>Example<278>: #function {rnd} {#math {result} {1 d (%2 - %1 + 1) + %1 - 1}}\n"
-		"         #showme A random number between 100 and 200: @rnd{100;200}\n"
+		"         #show A random number between 100 and 200: @rnd{100;200}\n"
 		"\n"
 		"<178>Example<278>: #function gettime {#format result %t %H:%M}\n"
-		"         #showme The current time is @gettime{}\n"
+		"         #show The current time is @gettime{}\n"
 		"\n"
 		"<178>Comment<278>: You can remove a function with the #unfunction command.\n",
 		
@@ -1762,7 +1763,7 @@ struct help_type help_table[] =
 	{
 		"KEYPAD",
 		"<278>When TinTin++ starts up it sends \\e= to the terminal to enable the terminal's\n"
-		"application keypad mode, which can be disabled using #showme {\\e>}\n"
+		"application keypad mode, which can be disabled using #show {\\e>}\n"
 		"\n"
 		"<178>      Configuration A           Configuration B           Configuration C<268>\n"
 		" ╭─────┬─────┬─────┬─────╮ ╭─────┬─────┬─────┬─────╮ ╭─────┬─────┬─────┬─────╮\n"
@@ -1945,7 +1946,7 @@ struct help_type help_table[] =
 		"<278>\n"
 		"<178>Example:<278>\n"
 		"         #variable {simple} {Hello World!}\n"
-		"         #showme $simple\n"
+		"         #show $simple\n"
 		"\n"
 		"         To see if the 'simple' variable exists you can use &simple which will\n"
 		"         display 0 if the variable does not exist, or the variable's index if\n"
@@ -1960,14 +1961,14 @@ struct help_type help_table[] =
 		"         numbers, and underscores. If you need to use a non standard variable\n"
 		"         name this is possible using braces.\n"
 		"\n"
-		"<178>Example: <278>#variable {:)} {Happy Happy!};#showme ${:)}\n"
+		"<178>Example: <278>#variable {:)} {Happy Happy!};#show ${:)}\n"
 		"\n"
 		"         Variables can be accessed using their index. While primarily useful\n"
 		"         for tables it is possible to do this for simple variables. Use +1 for\n"
 		"         the first variable, +2 for the second variable, etc. Use -1 for the\n"
 		"         last variable, -2 for the second last variable, etc.\n"
 		"\n"
-		"<178>Example:<278> #showme The first variable is: ${+1}\n"
+		"<178>Example:<278> #show The first variable is: ${+1}\n"
 		"<128>\n"
 		"         Removing Variables\n"
 		"<278>\n"
@@ -1986,7 +1987,7 @@ struct help_type help_table[] =
 		"<278>\n"
 		"         A simple list is a string that contains semicolon delimited fields.\n"
 		"         Commands can be entered as simple lists, for example:\n"
-		"         #showme {a};#showme {b} will execute a single line as two commands.\n"
+		"         #show {a};#show {b} will execute a single line as two commands.\n"
 		"\n"
 		"         Several commands take a simple list as their input, these are:\n"
 		"         #foreach, #line substitute, #path load, #list create, and #highlight.\n"
@@ -2028,7 +2029,7 @@ struct help_type help_table[] =
 		"\n"
 		"         This will create a friendlist with two entries, the key is the name of\n"
 		"         the friend, the value is the email address of the friend. You can see\n"
-		"         the email address of bob using: #showme {$friendlist[bob]}. You can\n"
+		"         the email address of bob using: #show {$friendlist[bob]}. You can\n"
 		"         also define this table as following:\n"
 		"\n"
 		"<178>Example:<278>\n"
@@ -2060,7 +2061,7 @@ struct help_type help_table[] =
 		"\n"
 		"         There is no limit to the number of nests, simply add more braces. To\n"
 		"         see Bob's email in this example you would use:\n"
-		"         #showme {$friendlist[bob][email]}.\n"
+		"         #show {$friendlist[bob][email]}.\n"
 		"<278>\n"
 		"         Lists\n"
 		"\n"
@@ -2102,7 +2103,7 @@ struct help_type help_table[] =
 		"         control flow command. It takes special care to avoid infinite loops.\n"
 		"\n"
 		"         #<number> will execute the provided argument 'number' times. For\n"
-		"         example: #4 {#showme beep! \\a}\n"
+		"         example: #4 {#show beep! \\a}\n"
 		"\n"
 		"         Here are some examples.\n"
 		"\n"
@@ -2168,7 +2169,7 @@ struct help_type help_table[] =
 		"         	sethash bli hey;\n"
 		"         	sethash bla hi;\n"
 		"         	sethash blo hello;\n"
-		"         	#showme The value of bla is: @gethash{bla}\n"
+		"         	#show The value of bla is: @gethash{bla}\n"
 		"         }\n"
 		"\n"
 		"         The above script will rapidly store and retrieve over 1 million items.\n"
@@ -2207,7 +2208,7 @@ struct help_type help_table[] =
 		"\n"
 		"         Avoid setting the result variable as local in a function.\n"
 		"\n"
-		"<178>Example<278>: #alias {swap} {#local x %0;#replace x {e} {u};#showme $x}\n",
+		"<178>Example<278>: #alias {swap} {#local x %0;#replace x {e} {u};#show $x}\n",
 
 		"format function math replace script variable"
 	},
@@ -2259,7 +2260,7 @@ struct help_type help_table[] =
 		"         If you only want a key sequence to trigger at the start of an input\n"
 		"         line prefix the key sequence with ^.\n"
 		"\n"
-		"<178>Example<278>: #macro {(press ctrl-v)(press F1)} {#showme \\e[2J;#buffer lock}\n"
+		"<178>Example<278>: #macro {(press ctrl-v)(press F1)} {#show \\e[2J;#buffer lock}\n"
 		"         Clear the screen and lock the window when you press F1, useful when the\n"
 		"         boss is near.\n"
 		"\n"
@@ -2909,7 +2910,7 @@ struct help_type help_table[] =
 		"         the given string.  The value of the current character is stored in the\n"
 		"         provided variable.\n"
 		"\n"
-		"<178>Example<278>: #parse {hello world} {char} {#showme $char}\n",
+		"<178>Example<278>: #parse {hello world} {char} {#show $char}\n",
 
 		"break continue foreach list loop repeat return while"
 	},
@@ -2922,6 +2923,7 @@ struct help_type help_table[] =
 		"         delete   Will delete the last move of the path.\n"
 		"         describe Describe the path and current position.\n"
 		"         destroy  Will clear the path and stop path mapping.\n"
+		"         get      Will get either the length or position.\n"
 		"         goto     Go the the start, end, or given position index.\n"
 		"         insert   Add the given argument to the path.\n"
 		"         load     Load the given variable as the new path.\n"
@@ -2931,9 +2933,7 @@ struct help_type help_table[] =
 		"         run      Execute the current path, with an optional floating point\n"
 		"                  delay in seconds as the second argument.\n"
 		"         save     Save the path to a variable. You must specify whether you\n"
-		"                  want to save the path 'forward' or 'backward'. If you use\n"
-		"                  the 'length' or 'position' keywords the current length or\n"
-		"                  position is saved.\n"
+		"                  want to save the path 'forward' or 'backward'.\n"
 		"         swap     Switch the forward and backward path.\n"
 		"         unzip    Load the given speedwalk as the new path.\n"
 		"         walk     Take one step forward or backward.\n"
@@ -3110,14 +3110,14 @@ struct help_type help_table[] =
 		"         By default regex matches are greedy, meaning {.*} will capture as much\n"
 		"         text as possible.\n"
 		"\n"
-		"Example: #regex {bli bla blo} {^{.*} {.*}$} {#showme Arg1=(&1) Arg2=(&2)}\n"
+		"Example: #regex {bli bla blo} {^{.*} {.*}$} {#show Arg1=(&1) Arg2=(&2)}\n"
 		"\n"
 		"         This will display: Arg1=(bli bla) Arg2=(blo)\n"
 		"\n"
 		"         By appending a ? behind a regex it becomes lazy, meaning {.*?} will\n"
 		"         capture as little text as possible.\n"
 		"\n"
-		"Example: #regex {bli bla blo} {^{.*?} {.*?}$} {#showme Arg1=(&1) Arg2=(&2)}\n"
+		"Example: #regex {bli bla blo} {^{.*?} {.*?}$} {#show Arg1=(&1) Arg2=(&2)}\n"
 		"\n"
 		"         This will display: Arg1=(bli) Arg2=(bla blo).\n"
 		"\n"
@@ -3240,8 +3240,8 @@ struct help_type help_table[] =
 		"         column argument empty tintin will clear the row before printing at\n"
 		"         the start of the row.\n"
 		"\n"
-		"         The #showme command takes a row and col argument as well so it's also\n"
-		"         possible to place text on your split lines using #showme.\n"
+		"         The #show command takes a row and col argument as well so it's also\n"
+		"         possible to place text on your split lines using #show.\n"
 		"\n"
 		"<178>Comment<278>: See <178>#help split<278> for more information on split mode.\n"
 		"\n"
@@ -3320,7 +3320,7 @@ struct help_type help_table[] =
 		"         %15 as a regular expression, the next unnumbered regular expression\n"
 		"         would be %16. To prevent a match from being stored use %!*, %!w, etc.\n"
 		"\n"
-		"<178>Example<278>: #regexp {bli bla blo} {bli {.*} blo} {#showme &1}\n",
+		"<178>Example<278>: #regexp {bli bla blo} {bli {.*} blo} {#show &1}\n",
 
 		"case default else elseif if switch"
 	},
@@ -3532,10 +3532,10 @@ struct help_type help_table[] =
 		"\n"
 		"         If you provide a variable the output of the script is stored as a list.\n"
 		"\n"
-		"<178>Example<278>: #script {ruby -e 'print \"#showme hello world\"'}\n"
-		"<178>Example<278>: #script {python -c 'print \"#showme hello world\"'}\n"
-		"<178>Example<278>: #script {php -r 'echo \"#showme hello world\"'}\n"
-		"<178>Example<278>: #script {path} {pwd};#showme The path is $path[1].\n",
+		"<178>Example<278>: #script {ruby -e 'print \"#show hello world\"'}\n"
+		"<178>Example<278>: #script {python -c 'print \"#show hello world\"'}\n"
+		"<178>Example<278>: #script {php -r 'echo \"#show hello world\"'}\n"
+		"<178>Example<278>: #script {path} {pwd};#show The path is $path[1].\n",
 
 		"format function local math replace variable"
 	},
@@ -3621,16 +3621,16 @@ struct help_type help_table[] =
 	{
 		"SHOWME",
 
-		"<178>Command<278>: #showme <178>{<278>string<178>} {<278>row<178>} <178>{<278>col<178>}<278>\n"
+		"<178>Command<278>: #show <178>{<278>string<178>} {<278>row<178>} <178>{<278>col<178>}<278>\n"
 		"\n"
 		"         Display the string to the terminal, do not send to the server.  Useful\n"
 		"         for status, warnings, etc.  The {row} and col number are optional and\n"
 		"         work the same way as the row number of the #prompt trigger.\n"
 		"\n"
-		"         Actions can be triggered by the showme command. If you want to avoid\n"
-		"         this from happening use: #line ignore #showme {<string>}.\n"
+		"         Actions can be triggered by the show command. If you want to avoid\n"
+		"         this from happening use: #line ignore #show {<string>}.\n"
 		"\n"
-		"<178>Example<278>: #tick {TICK} {#delay 50 #showme 10 SECONDS TO TICK!!!} {60}\n"
+		"<178>Example<278>: #tick {TICK} {#delay 50 #show 10 SECONDS TO TICK!!!} {60}\n"
 		"\n"
 		"<178>Comment<278>: The #prompt helpfile contains more information on using the\n"
 		"         option {row} and {col} arguments.\n",
@@ -3710,7 +3710,7 @@ struct help_type help_table[] =
 		"         input line. Great for the minimalist.\n"
 		"\n"
 		"<178>Comment<278>: You can display text on the split line(s) with the #prompt and\n"
-		"         #showme {line} {row} commands.\n"
+		"         #show {line} {row} commands.\n"
 		"\n"
 		"<178>Comment<278>: You can remove split mode with the #unsplit command.\n",
 
@@ -3941,13 +3941,13 @@ struct help_type help_table[] =
 		"         Nested variables are also known as tables, table generally being used\n"
 		"         to refer to several variables nested within one specific variable.\n"
 		"\n"
-		"<178>Example<278>: #showme {Targets starting with the letter A: $targets[A%*]\n"
+		"<178>Example<278>: #show {Targets starting with the letter A: $targets[A%*]\n"
 		"\n"
 		"         To see the internal index of a variable use &<variable name>. To see\n"
 		"         the size of a table you would use: &targets[] or &targets[%*]. A non\n"
 		"         existent nested variable will report itself as 0.\n"
 		"\n" 
-		"<178>Example<278>: #showme {Number of targets starting with A: &targets[A%*]\n"
+		"<178>Example<278>: #show {Number of targets starting with A: &targets[A%*]\n"
 		"\n"
 		"         In some scripts you need to know the name of a nested variable. This\n"
 		"         is also known as the key, and you can get it using *variable. For\n"

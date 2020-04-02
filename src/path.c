@@ -261,6 +261,40 @@ DO_PATH(path_map)
 	}
 }
 
+DO_PATH(path_get)
+{
+	struct listroot *root = ses->list[LIST_PATH];
+	char result[STRING_SIZE], arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
+
+	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
+	arg = sub_arg_in_braces(ses, arg, arg2, GET_ONE, SUB_VAR|SUB_FUN);
+
+	if (*arg2 == 0)
+	{
+		tintin_printf2(ses, "  length: %d", root->used);
+		tintin_printf2(ses, "position: %d", root->update + 1);
+	}
+	else if (is_abbrev(arg1, "LENGTH"))
+	{
+		sprintf(result, "%d", root->used);
+
+		set_nest_node_ses(ses, arg2, "%s", result);
+
+		show_message(ses, LIST_COMMAND, "#PATH GET: PATH LENGTH {%s} SAVED TO {%s}", result, arg2);
+	}
+	else if (is_abbrev(arg1, "POSITION"))
+	{
+		sprintf(result, "%d", root->update + 1);
+
+		set_nest_node_ses(ses, arg2, "%s", result);
+
+		show_message(ses, LIST_COMMAND, "#PATH GET: PATH POSITION {%s} SAVED TO {%s}", result, arg2);
+	}
+	else
+	{
+		show_error(ses, LIST_COMMAND, "#SYNTAX: #PATH GET <LENGTH|POSITION> <VARIABLE NAME>");
+	}
+}
 
 DO_PATH(path_save)
 {
@@ -277,7 +311,7 @@ DO_PATH(path_save)
 	}
 	else if (*arg2 == 0)
 	{
-		show_error(ses, LIST_COMMAND, "#SYNTAX: #PATH SAVE <BACKWARD|FORWARD|LENGTH|POSITION> <VARIABLE NAME>");
+		show_error(ses, LIST_COMMAND, "#SYNTAX: #PATH SAVE <BACKWARD|FORWARD> <VARIABLE NAME>");
 	}
 	else if (is_abbrev(arg1, "BACKWARDS"))
 	{
@@ -331,7 +365,7 @@ DO_PATH(path_save)
 	}
 	else
 	{
-		show_error(ses, LIST_COMMAND, "#SYNTAX: #PATH SAVE <BACKWARD|FORWARD|LENGTH|POSITION> <VARIABLE NAME>");
+		show_error(ses, LIST_COMMAND, "#SYNTAX: #PATH SAVE <BACKWARD|FORWARD> <VARIABLE NAME>");
 	}
 }
 

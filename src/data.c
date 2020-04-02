@@ -84,7 +84,7 @@ struct listroot *copy_list(struct session *ses, struct listroot *sourcelist, int
 			node->arg2  = str_dup_clone(sourcelist->list[i]->arg2);
 			node->arg3  = str_dup_clone(sourcelist->list[i]->arg3);
 			node->arg4  = str_dup_clone(sourcelist->list[i]->arg4);
-			node->flags = sourcelist->list[i]->flags;
+			node->shots = sourcelist->list[i]->shots;
 			node->group = strdup(sourcelist->list[i]->group);
 
 			switch (type)
@@ -147,9 +147,9 @@ struct listnode *insert_node_list(struct listroot *root, char *arg1, char *arg2,
 	node->arg3 = str_dup(arg3);
 	node->arg4 = str_dup(arg4);
 
-	if (gtd->level->oneshot)
+	if (gtd->level->shots)
 	{
-		SET_BIT(node->flags, NODE_FLAG_ONESHOT);
+		node->shots = gtd->level->shots;
 	}
 
 	node->group = HAS_BIT(root->flags, LIST_FLAG_CLASS) ? strdup(root->ses->group) : strdup("");
@@ -191,9 +191,9 @@ struct listnode *update_node_list(struct listroot *root, char *arg1, char *arg2,
 
 		node = root->list[index];
 
-		if (gtd->level->oneshot)
+		if (gtd->level->shots)
 		{
-			SET_BIT(node->flags, NODE_FLAG_ONESHOT);
+			node->shots = gtd->level->shots;
 		}
 
 		if (strcmp(node->arg2, arg2) != 0)
@@ -1059,7 +1059,7 @@ DO_COMMAND(do_info)
 				{
 					for (cnt = 0 ; cnt < root->used ; cnt++)
 					{
-						tintin_printf2(ses, "#INFO %s %4d {arg1}{%s} {arg2}{%s} {arg3}{%s} {arg4}{%s} {class}{%s} {flags}{%d}", list_table[index].name, cnt, root->list[cnt]->arg1, root->list[cnt]->arg2, root->list[cnt]->arg3, root->list[cnt]->arg4, root->list[cnt]->group, root->list[cnt]->flags);
+						tintin_printf2(ses, "#INFO %s %4d {arg1}{%s} {arg2}{%s} {arg3}{%s} {arg4}{%s} {class}{%s} {shots}{%u}", list_table[index].name, cnt, root->list[cnt]->arg1, root->list[cnt]->arg2, root->list[cnt]->arg3, root->list[cnt]->arg4, root->list[cnt]->group, root->list[cnt]->shots);
 					}
 				}
 				else if (is_abbrev(arg2, "SAVE"))
@@ -1071,7 +1071,7 @@ DO_COMMAND(do_info)
 					{
 						sprintf(name, "info[%s][%d]", list_table[index].name, cnt);
 
-						set_nest_node_ses(ses, name, "{arg1}{%s}{arg2}{%s}{arg3}{%s}{arg4}{%s}{class}{%s}{flags}{%d}", root->list[cnt]->arg1, root->list[cnt]->arg2, root->list[cnt]->arg3, root->list[cnt]->arg4, root->list[cnt]->group, root->list[cnt]->flags);
+						set_nest_node_ses(ses, name, "{arg1}{%s}{arg2}{%s}{arg3}{%s}{arg4}{%s}{class}{%s}{shots}{%u}", root->list[cnt]->arg1, root->list[cnt]->arg2, root->list[cnt]->arg3, root->list[cnt]->arg4, root->list[cnt]->group, root->list[cnt]->shots);
 					}
 					show_message(ses, LIST_COMMAND, "#INFO: DATA WRITTEN TO {info[%s]}", list_table[index].name);
 				}

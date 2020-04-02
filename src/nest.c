@@ -671,7 +671,7 @@ struct listnode *get_nest_node_key(struct listroot *root, char *variable, char *
 	{
 		str_cpy_printf(result, "%s", node->arg1);
 
-		if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+		if (node->shots && --node->shots == 0)
 		{
 			delete_nest_node(root, variable);
 		}
@@ -691,8 +691,6 @@ struct listnode *get_nest_node_key(struct listroot *root, char *variable, char *
 	return NULL;
 }
 
-// Has ONESHOT check
-
 struct listnode *get_nest_node_val(struct listroot *root, char *variable, char **result, int def)
 {
 	struct listnode *node;
@@ -711,7 +709,7 @@ struct listnode *get_nest_node_val(struct listroot *root, char *variable, char *
 	{
 		show_nest_node(node, result, TRUE);
 
-		if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+		if (node->shots && --node->shots == 0)
 		{
 			delete_nest_node(root, variable);
 		}
@@ -753,7 +751,7 @@ int get_nest_index(struct listroot *root, char *variable, char **result, int def
 	{
 		str_cpy_printf(result, "%d", index + 1);
 
-		if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+		if (node->shots && --node->shots == 0)
 		{
 			delete_index_list(root, index);
 		}
@@ -926,9 +924,9 @@ struct listnode *set_nest_node_ses(struct session *ses, char *arg1, char *format
 		node = update_node_list(root, name, arg2, "", "");
 	}
 
-	if (gtd->level->oneshot)
+	if (gtd->level->shots)
 	{
-		SET_BIT(node->flags, NODE_FLAG_ONESHOT);
+		node->shots = gtd->level->shots;
 	}
 
 	check_all_events(root->ses, SUB_ARG, 1, 1, "VARIABLE UPDATED %s", name, name, arg2);
@@ -1006,9 +1004,9 @@ struct listnode *add_nest_node_ses(struct session *ses, char *arg1, char *format
 		node = update_node_list(root, name, arg2, "", "");
 	}
 
-	if (gtd->level->oneshot)
+	if (gtd->level->shots)
 	{
-		SET_BIT(node->flags, NODE_FLAG_ONESHOT);
+		node->shots = gtd->level->shots;
 	}
 
 	check_all_events(root->ses, SUB_ARG, 1, 1, "VARIABLE UPDATED %s", name, name, arg2);
@@ -1081,9 +1079,9 @@ struct listnode *set_nest_node(struct listroot *root, char *arg1, char *format, 
 		node = update_node_list(root, name, arg2, "", "");
 	}
 
-	if (gtd->level->oneshot)
+	if (gtd->level->shots)
 	{
-		SET_BIT(node->flags, NODE_FLAG_ONESHOT);
+		node->shots = gtd->level->shots;
 	}
 
 	check_all_events(root->ses, SUB_ARG, 1, 1, "VARIABLE UPDATED %s", name, name, arg2);
@@ -1160,9 +1158,9 @@ struct listnode *add_nest_node(struct listroot *root, char *arg1, char *format, 
 		node = update_node_list(root, name, arg2, "", "");
 	}
 
-	if (gtd->level->oneshot)
+	if (gtd->level->shots)
 	{
-		SET_BIT(node->flags, NODE_FLAG_ONESHOT);
+		node->shots = gtd->level->shots;
 	}
 
 	check_all_events(root->ses, SUB_ARG, 1, 1, "VARIABLE UPDATED %s", name, name, arg2);

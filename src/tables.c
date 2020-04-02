@@ -941,6 +941,14 @@ struct cursor_type cursor_table[] =
 		cursor_paste_buffer
 	},
 	{
+		"PRESERVE MACRO",
+		"Preserve the current macro state",
+		"",
+		CURSOR_FLAG_GET_ALL,
+		cursor_preserve_macro
+	},
+
+	{
 		"PREV WORD",
 		"Move cursor to the previous word",
 		"\eb",
@@ -1476,6 +1484,7 @@ struct path_type path_table[] =
 	{    "DESCRIBE",          path_describe,       "Describe the path and current position."        },
 	{    "DESTROY",           path_destroy,        "Clear the path and stop path mapping."          },
 	{    "END",               path_end,            ""                                               },
+	{    "GET",               path_get,            "Store a path value into a variable."            },
 	{    "GOTO",              path_goto,           "Move position to given index."                  },
 	{    "INSERT",            path_insert,         "Insert a command to the end of the path."       },
 	{    "LOAD",              path_load,           "Load a path from a variable."                   },

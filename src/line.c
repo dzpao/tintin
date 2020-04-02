@@ -30,6 +30,8 @@ DO_COMMAND(do_line)
 	char arg1[BUFFER_SIZE];
 	int cnt;
 
+	push_call("do_line(%p,%p)",ses,arg);
+
 	arg = get_arg_in_braces(ses, arg, arg1, GET_ONE);
 
 	if (*arg1 == 0)
@@ -45,6 +47,7 @@ DO_COMMAND(do_line)
 		}
 		tintin_header(ses, "");
 
+		pop_call();
 		return ses;
 	}
 	else
@@ -66,6 +69,7 @@ DO_COMMAND(do_line)
 			ses = line_table[cnt].fun(ses, arg);
 		}
 	}
+	pop_call();
 	return ses;
 }
 
@@ -441,11 +445,11 @@ DO_LINE(line_oneshot)
 		return ses;
 	}
 
-	gtd->level->oneshot++;
+	gtd->level->shots++;
 
 	ses = script_driver(ses, LIST_COMMAND, arg1);
 
-	gtd->level->oneshot--;
+	gtd->level->shots--;
 
 	return ses;
 }

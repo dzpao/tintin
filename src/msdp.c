@@ -176,7 +176,7 @@ void msdp_update_varf(struct session *ses, struct port_data *buddy, char *var, c
 
 void msdp_update_var_instant(struct session *ses, struct port_data *buddy, char *var, char *fmt, ...)
 {
-	char buf[STRING_SIZE];
+	char buf[BUFFER_SIZE], out[STRING_SIZE];
 	int index, length;
 	va_list args;
 
@@ -200,9 +200,9 @@ void msdp_update_var_instant(struct session *ses, struct port_data *buddy, char 
 
 	if (HAS_BIT(buddy->msdp_data[index]->flags, MSDP_FLAG_REPORTED))
 	{
-		length = sprintf(buf, "%c%c%c%c%s%c%s%c%c", IAC, SB, TELOPT_MSDP, MSDP_VAR, msdp_table[index].name, MSDP_VAL, buf, IAC, SE);
+		length = sprintf(out, "%c%c%c%c%s%c%s%c%c", IAC, SB, TELOPT_MSDP, MSDP_VAR, msdp_table[index].name, MSDP_VAL, buf, IAC, SE);
 
-		write_msdp_to_descriptor(ses, buddy, buf, length);
+		write_msdp_to_descriptor(ses, buddy, out, length);
 	}
 }
 

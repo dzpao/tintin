@@ -1563,7 +1563,7 @@ int get_link_screen(struct session *ses, char *result, int flags, int row, int c
 
 				opt = 0;
 
-				while (isdigit(*pts))
+				while (isdigit((int) *pts))
 				{
 					opt = opt * 10 + (*pts++ - '0');
 				}
@@ -1810,7 +1810,7 @@ int get_link_screen(struct session *ses, char *result, int flags, int row, int c
 
 //					tintin_printf2(gtd->ses, "\e[1;32mfound link: (%d,%d) [%s]", col, len, result);
 
-					return opt ? opt : TRUE;
+					return opt ? opt : 1;
 				}
 				else
 				{

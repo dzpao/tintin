@@ -1,3 +1,15 @@
+Mar 2020        2.02.03
+------------------------------------------------------------------------------
+
+cursor.c        Added #cursor {preserve macro} which called from within a
+                macro will preserve the macro state. Example:
+
+                #macro {\cg} {#showme e: end\nh: home;#cursor preserve macro}
+                #macro {\cge} {#showme end}
+                #macro {\cgh} {#showme home}
+
+path.c          Added #path get {LENGTH|POSITION} <variable>
+
 Jan 2020        2.02.02
 ------------------------------------------------------------------------------
 

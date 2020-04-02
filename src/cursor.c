@@ -1095,6 +1095,10 @@ DO_CURSOR(cursor_paste_buffer)
 	modified_input();
 }
 
+DO_CURSOR(cursor_preserve_macro)
+{
+	SET_BIT(gtd->flags, TINTIN_FLAG_PRESERVEMACRO);
+}
 
 DO_CURSOR(cursor_redraw_input)
 {
@@ -1323,7 +1327,7 @@ int cursor_tab_add(int input_now, int stop_after_first)
 				}
 				insert_node_list(gtd->ses->list[LIST_COMMAND], tab, "", "", "");
 
-				if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+				if (node->shots && --node->shots == 0)
 				{
 					delete_node_list(gtd->ses, LIST_TAB, node);
 				}

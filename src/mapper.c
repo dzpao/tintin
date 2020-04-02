@@ -3735,7 +3735,7 @@ void map_search_compile(struct session *ses, char *arg, char *var)
 
 		ptb = buf;
 
-		while (*buf)
+		while (*ptb)
 		{
 			ptb = sub_arg_in_braces(ses, ptb, flags, GET_ONE, SUB_NONE);
 
@@ -5427,10 +5427,10 @@ void exit_edit(struct session *ses, struct exit_data *exit, char *arg, char *arg
 	{
 		tintin_printf2(ses, "      color: %s", str_convert_meta(exit->color, TRUE));
 		tintin_printf2(ses, "    command: %s", exit->cmd);
+		tintin_printf2(ses, "       data: %s", exit->data);
 		tintin_printf2(ses, "destination: %d", tunnel_void(ses, ses->map->in_room, exit->vnum, exit->dir));
 		tintin_printf2(ses, "  direction: %d", exit->dir);
 		tintin_printf2(ses, "      flags: %d", exit->flags);
-		tintin_printf2(ses, "    get/set: %s", exit->data);
 		tintin_printf2(ses, "       name: %s", exit->name);
 		tintin_printf2(ses, "       vnum: %d", exit->vnum);
 		tintin_printf2(ses, "     weight: %.3f", exit->weight);
@@ -5495,7 +5495,7 @@ void exit_edit(struct session *ses, struct exit_data *exit, char *arg, char *arg
 	{
 		if (*arg3)
 		{
-			set_nest_node_ses(ses, arg3, "{command}{%s}{destination}{%d}{dir}{%d}{flags}{%d}{name}{%s}{vnum}{%d}{weight}{%.3f}", exit->cmd, tunnel_void(ses, ses->map->in_room, exit->vnum, exit->dir), exit->dir, exit->flags, exit->name, exit->vnum, exit->weight);
+			set_nest_node_ses(ses, arg3, "{color}{%s}{command}{%s}{destination}{%d}{dir}{%d}{flags}{%d}{name}{%s}{vnum}{%d}{weight}{%.3f}", exit->color, exit->cmd, tunnel_void(ses, ses->map->in_room, exit->vnum, exit->dir), exit->dir, exit->flags, exit->name, exit->vnum, exit->weight);
 		}
 		else
 		{

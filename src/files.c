@@ -448,7 +448,7 @@ DO_COMMAND(do_write)
 		{
 			node = root->list[j];
 
-			if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+			if (node->shots)//HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
 			{
 				continue;
 			}

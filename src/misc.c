@@ -261,15 +261,15 @@ DO_COMMAND(do_test)
 	strcpy(arg3, "<f0b8>");
 	strcpy(arg4, "1 9");
 
-	if (isdigit(arg[0]))
+	if (isdigit((int) arg[0]))
 	{
 		sprintf(arg2, "%d", (arg[0] - '0') * (arg[0] - '0'));
 
-		if ((isxdigit(arg[1]) && isxdigit(arg[2]) && isxdigit(arg[3])) || (arg[1] == '?' && arg[2] == '?' && arg[3] == '?'))
+		if ((isxdigit((int) arg[1]) && isxdigit((int) arg[2]) && isxdigit((int) arg[3])) || (arg[1] == '?' && arg[2] == '?' && arg[3] == '?'))
 		{
 			sprintf(arg3, "<f%c%c%c>", arg[1], arg[2], arg[3]);
 
-			if (isdigit(arg[4]) && isdigit(arg[5]))
+			if (isdigit((int) arg[4]) && isdigit((int) arg[5]))
 			{
 				sprintf(arg4, "%f %d %s", (arg[4] - '0') * (arg[4] - '0') / 10.0, (arg[5] - '0') * (arg[5] - '0'), &arg[6]);
 

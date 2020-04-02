@@ -1,8 +1,20 @@
 * BUGS
 
+  - Make #line capture work with #showme
+
+  - Make CHARSET bi-directional
+
+  - Add a SPLIT drawing catch event
+
+  - Fix SEND OUTPUT capture in 2UTF8 modes.
+
 * STUFF THAT IS PROBABLY GONNA GET DONE
 
-  - #message all log?
+  - multi-line buffer searches / captures
+
+  - #line multishot support
+
+  - add color based auto unwrap routine.
 
   - Work on VT2020 protocol (mouse click)
 
@@ -24,6 +36,8 @@
   - there might be a terrain density bug
   - provide the coordinate of the X on the vtmap.
   - add maze flag for maze handling.
+  - Request: aura around the character position. Something similar to terrain dense narrow. Could improve visibility of the character position on big resolutions. Furthermor config to allow modification of the character terrain. 
+  - vt map doesn't utilize all available space.
 
   - #draw table {1;2;3;4} {a;b;c;d} 
     #draw scrollbar
@@ -132,6 +146,8 @@
   - GUI mode
 
   - Braille handling
+
+  - Allow converting tt++ scripts to C.
 
 --------------------------------------------------------------------------------
 

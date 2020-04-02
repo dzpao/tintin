@@ -1,0 +1,172 @@
+#!./tt++ -G
+
+#math error 0
+
+#alias error
+{
+    #math error $error + 1;
+    #line ignore #showme <118>Failed test %0
+}
+
+#nop ----------
+
+#math tmp 1 + 1
+
+#if {$tmp != 2}
+{
+    error 1: math failure
+}
+
+#nop ----------
+
+#alias {test} {#math tmp $tmp + 1}
+#line oneshot #alias {test%*} {#nop} {4}
+#math tmp 0
+#2 test
+#if {$tmp != 1}
+{
+    error 2: oneshot or math or alias failure
+}
+
+#nop ----------
+
+#1 {#return;error 3: #return failure}
+
+#nop ----------
+
+#buf get tmp -3 -1
+
+#if {&tmp[] != 2}
+{
+    error 4: buffer or variable or if failure ($tmp)
+}
+
+#nop ----------
+
+#switch {3} {#case 3 #return;#default error 5: switch failure}
+
+#nop ----------
+
+#class tmp open
+#unvar tmp
+#var tmp 1
+#class tmp kill
+
+#if {&{tmp} != 0}
+{
+    error 6: class or variable failure
+}
+
+#nop ----------
+
+#loop 1 2 tmp {#continue;error 7: continue failure}
+
+#nop ----------
+
+#kill variable %*
+
+#if {&{tmp} != 0}
+{
+    error 8: kill variable %* failure
+}
+
+#line strip #if {{<128>} != {}}
+{
+    error 9: line strip failure
+}
+
+#nop ----------
+
+#act {test} {error 10: line ignore failure}
+#line gag;
+#line ignore #showme <118>Failed test 10: line gag failure
+#unact {test}
+
+#nop ----------
+
+#parse {abcd} {tmp} {#var tmp ($tmp)}
+#if {"$tmp" != "(d)"}
+{
+    error 11: parse failure
+}
+
+#nop ----------
+
+#path load {#var tmp 1}
+#path walk
+#if {$tmp != 1}
+{
+    error 12: path load or walk failure
+}
+
+#nop ----------
+
+#script tmp {echo 'test'}
+#if {{$tmp[1]} != {test}}
+{
+    error 13: script failure
+}
+
+#nop ----------
+
+#regex {test} {te%?t} {#nop}
+{
+    error 14: regex failure
+}
+
+#nop ----------
+
+#regex {bla} {bli}
+{
+    error 15: regex failure
+}
+
+#nop ----------
+
+#0 error 16: repeat failure
+
+#nop ----------
+
+#unvar tmp
+
+#1
+{
+    #local tmp 1;
+    #if {$tmp != 1}
+    {
+        error 17: local failure
+    }
+}
+
+#nop ----------
+
+#if {$tmp == 1}
+{
+	error 18: local failure
+}
+
+#nop ----------
+
+#1
+{
+    #local tmp 2;
+
+    #regex {a} {a}
+    {
+        #if {$tmp != 2}
+        {
+            error 19: local failure
+        }
+    }
+}
+
+#nop ----------
+
+#if {$error}
+{
+    #end <118>End of validation with $error errors.<088>
+}
+{
+    #end <128>End of validation with 0 errors.<088>
+}
+

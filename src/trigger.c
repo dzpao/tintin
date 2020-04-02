@@ -80,7 +80,7 @@ void check_all_actions(struct session *ses, char *original, char *line)
 
 			substitute(ses, node->arg2, buf, SUB_ARG|SUB_SEC);
 
-			if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+			if (node->shots && --node->shots == 0)
 			{
 				delete_node_list(ses, LIST_ACTION, node);
 			}
@@ -210,7 +210,7 @@ int check_all_aliases(struct session *ses, char *input)
 
 			show_debug(ses, LIST_ALIAS, "#DEBUG ALIAS {%s} {%s}", node->arg1, gtd->vars[0]);
 
-			if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+			if (node->shots && --node->shots == 0)
 			{
 				delete_node_list(ses, LIST_ALIAS, node);
 			}
@@ -344,7 +344,7 @@ void check_all_buttons(struct session *ses, short row, short col, char *arg1, ch
 
 			substitute(ses, node->arg2, buf, SUB_ARG|SUB_SEC);
 
-			if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+			if (node->shots && --node->shots == 0)
 			{
 				delete_node_list(ses, LIST_BUTTON, node);
 			}
@@ -397,11 +397,11 @@ DO_COMMAND(do_delay)
 		{
 			get_number_string(ses, arg3, time);
 
-			gtd->level->oneshot++;
+			gtd->level->shots++;
 
 			update_node_list(ses->list[LIST_TICKER], arg1, arg2, time, "");
 
-			gtd->level->oneshot--;
+			gtd->level->shots--;
 			
 			show_message(ses, LIST_TICKER, "#OK. #TICK {%s} WILL EXECUTE {%s} IN {%s} SECONDS.", arg1, arg2, time);
 		}
@@ -411,7 +411,7 @@ DO_COMMAND(do_delay)
 
 DO_COMMAND(do_undelay)
 {
-	if (isalpha(*arg))
+	if (isalpha((int) *arg))
 	{
 		delete_node_with_wild(ses, LIST_TICKER, arg);
 	}
@@ -518,7 +518,7 @@ void check_all_gags(struct session *ses, char *original, char *line)
 		{
 //			show_debug(ses, LIST_GAG, "#DEBUG GAG {%s}", node->arg1);
 
-			if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+			if (node->shots && --node->shots == 0)
 			{
 				delete_node_list(ses, LIST_GAG, node);
 			}
@@ -641,7 +641,7 @@ void check_all_highlights(struct session *ses, char *original, char *line)
 			}
 			while (check_one_regexp(ses, node, ptl, pto, 0));
 
-			if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+			if (node->shots && --node->shots == 0)
 			{
 				delete_node_list(ses, LIST_HIGHLIGHT, node);
 			}
@@ -780,7 +780,7 @@ int check_all_prompts(struct session *ses, char *original, char *line, int check
 
 			split_show(ses, original, atoi(node->arg3), atoi(node->arg4));
 
-			if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+			if (node->shots && --node->shots == 0)
 			{
 				delete_node_list(ses, LIST_GAG, node);
 			}
@@ -888,7 +888,7 @@ void check_all_substitutions(struct session *ses, char *original, char *line)
 			}
 			while (check_one_regexp(ses, node, ptl, pto, 0));
 
-			if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+			if (node->shots && --node->shots == 0)
 			{
 				delete_node_list(ses, LIST_SUBSTITUTE, node);
 			}

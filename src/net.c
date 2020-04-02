@@ -223,18 +223,27 @@ void write_line_mud(struct session *ses, char *line, int size)
 		return;
 	}
 
+
+
+	if (check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "CATCH SEND OUTPUT", line, ntos(size)))
+	{
+		pop_call();
+		return;
+	}
+
+	check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "SEND OUTPUT", line, ntos(size));
+
 	if (!HAS_BIT(ses->telopts, TELOPT_FLAG_TELNET) && HAS_BIT(ses->charset, CHARSET_FLAG_ALL_TOUTF8))
 	{
 		char buf[BUFFER_SIZE];
 
 		size = utf8_to_all(ses, line, buf);
 
-		strcpy(line, buf);
+		memcpy(line, buf, size);
+
+		line[size] = 0;
 	}
 
-	check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "SEND OUTPUT", line, ntos(size));
-
-	if (!check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "CATCH SEND OUTPUT", line, ntos(size)))
 	{
 		if (ses->mccp3)
 		{
@@ -350,12 +359,16 @@ void readmud(struct session *ses)
 
 	push_call("readmud(%p)", ses);
 
+	gtd->mud_output_len = 0;
+
 	if (gtd->mud_output_len < BUFFER_SIZE)
 	{
+		if (check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "CATCH RECEIVED OUTPUT", gtd->mud_output_buf))
+		{
+			return;
+		}
 		check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "RECEIVED OUTPUT", gtd->mud_output_buf);
 	}
-
-	gtd->mud_output_len = 0;
 
 	/* separate into lines and print away */
 

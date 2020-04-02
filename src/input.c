@@ -193,10 +193,9 @@ void read_line(char *input, int len)
 		strcat(gtd->macro_buf, input);
 	}
 
-	if (check_key(input, len))
-	{
-		return;
-	}
+	get_utf8_index(input, &index);
+
+	check_all_events(gtd->ses, SUB_ARG, 0, 2, "RECEIVED KEYPRESS", input, ntos(index));
 
 	if (HAS_BIT(gtd->ses->charset, CHARSET_FLAG_UTF8) && is_utf8_head(gtd->macro_buf))
 	{
@@ -206,6 +205,11 @@ void read_line(char *input, int len)
 		}
 	}
 
+	if (check_key(input, len))
+	{
+		return;
+	}
+
 	if (gtd->macro_buf[0] == ASCII_ESC)
 	{
 		strcpy(input, gtd->macro_buf);
@@ -213,9 +217,6 @@ void read_line(char *input, int len)
 		convert_meta(input, gtd->macro_buf, FALSE);
 	}
 
-	get_utf8_index(gtd->macro_buf, &index);
-
-	check_all_events(gtd->ses, SUB_ARG, 0, 2, "RECEIVED KEYPRESS", gtd->macro_buf, ntos(index));
 
 	if (check_all_events(gtd->ses, SUB_ARG, 0, 2, "CATCH RECEIVED KEYPRESS", gtd->macro_buf, ntos(index)) == 1)
 	{
@@ -398,7 +399,7 @@ int check_key(char *input, int len)
 
 	if (!HAS_BIT(gtd->ses->flags, SES_FLAG_CONVERTMETA))
 	{
-		root  = gtd->ses->list[LIST_MACRO];
+		root = gtd->ses->list[LIST_MACRO];
 
 		if (!HAS_BIT(root->flags, LIST_FLAG_IGNORE))
 		{
@@ -414,14 +415,22 @@ int check_key(char *input, int len)
 				{
 					strcpy(buf, node->arg2);
 
-					if (HAS_BIT(node->flags, NODE_FLAG_ONESHOT))
+					if (node->shots && --node->shots == 0)
 					{
 						delete_node_list(gtd->ses, LIST_MACRO, node);
 					}
 
 					script_driver(gtd->ses, LIST_MACRO, buf);
 
-					gtd->macro_buf[0] = 0;
+					if (HAS_BIT(gtd->flags, TINTIN_FLAG_PRESERVEMACRO))
+					{
+						DEL_BIT(gtd->flags, TINTIN_FLAG_PRESERVEMACRO);
+					}
+					else
+					{
+						gtd->macro_buf[0] = 0;
+					}
+
 					pop_call();
 					return TRUE;
 				}
@@ -466,7 +475,7 @@ int check_key(char *input, int len)
 
 					for (len = 3 ; gtd->macro_buf[len] ; len++)
 					{
-						if (isdigit(gtd->macro_buf[len]))
+						if (isdigit((int) gtd->macro_buf[len]))
 						{
 							cat_sprintf(input, "%c", gtd->macro_buf[len]);
 						}
@@ -514,7 +523,7 @@ int check_key(char *input, int len)
 							return FALSE;
 						}
 
-						if (isdigit(gtd->macro_buf[len]))
+						if (isdigit((int) gtd->macro_buf[len]))
 						{
 							cat_sprintf(input, "%c", gtd->macro_buf[len]);
 						}

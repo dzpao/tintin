@@ -215,9 +215,11 @@ int skip_vt102_codes(char *str)
 			{
 				if (str[skip] == 30) // HTML_CLOSE
 				{
+					pop_call();
 					return skip + 1;
 				}
 			}
+			pop_call();
 			return 0;
 
 		case 127:   /* DEL */
@@ -269,6 +271,7 @@ int skip_vt102_codes(char *str)
 					{
 						if (str[skip] == '\a' || (str[skip] == '\e' && str[skip+1] == '\\'))
 						{
+							pop_call();
 							return skip + 1;
 						}
 					}

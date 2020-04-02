@@ -232,16 +232,16 @@ char *substitute_speedwalk(struct session *ses, char *input, char *output)
 
 	while (*pti && pto - output < INPUT_SIZE)
 	{
-		while (isspace(*pti))
+		while (isspace((int) *pti))
 		{
 			pti++;
 		}
 
-		if (isdigit(*pti))
+		if (isdigit((int) *pti))
 		{
 			ptn = num;
 
-			while (isdigit(*pti))
+			while (isdigit((int) *pti))
 			{
 				if (ptn - num < 4)
 				{

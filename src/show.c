@@ -30,8 +30,14 @@
 
 DO_COMMAND(do_showme)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE], arg3[BUFFER_SIZE], temp[STRING_SIZE], *output;
+	static char *output;
+	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE], arg3[BUFFER_SIZE], temp[STRING_SIZE];
 	int lnf;
+
+	if (output == NULL)
+	{
+		output = str_alloc(STRING_SIZE);
+	}
 
 	arg = get_arg_in_braces(ses, arg, arg1, GET_ALL);
 
@@ -67,11 +73,11 @@ DO_COMMAND(do_showme)
 
 	if (strip_vt102_strlen(ses, ses->more_output) != 0)
 	{
-		output = str_dup_printf("\n%s%s%s", COLOR_TEXT, arg1, COLOR_TEXT);
+		str_cpy_printf(&output, "\n%s%s%s", COLOR_TEXT, arg1, COLOR_TEXT);
 	}
 	else
 	{
-		output = str_dup_printf("%s%s%s", COLOR_TEXT, arg1, COLOR_TEXT);
+		str_cpy_printf(&output, "%s%s%s", COLOR_TEXT, arg1, COLOR_TEXT);
 	}
 
 	add_line_buffer(ses, output, lnf);
@@ -92,8 +98,6 @@ DO_COMMAND(do_showme)
 			restore_pos(ses);
 		}
 	}
-
-	str_free(output);
 
 	return ses;
 }

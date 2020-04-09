@@ -1,6 +1,8 @@
 Mar 2020        2.02.03
 ------------------------------------------------------------------------------
 
+utf8.c          Added #config charset CP1251TOUTF8
+
 cursor.c        Added #cursor {preserve macro} which called from within a
                 macro will preserve the macro state. Example:
 

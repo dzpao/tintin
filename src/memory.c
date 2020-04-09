@@ -389,3 +389,25 @@ void str_free(char *ptr)
 
 	free(str_ptr);
 }
+
+// stack handling
+
+char *str_alloc_stack(int size)
+{
+	char *str;
+
+	struct str_data *str_ptr = (struct str_data *) calloc(1, sizeof(struct str_data) + size + 1);
+
+	LINK(str_ptr, gtd->memory_stack->next, gtd->memory_stack->prev);
+
+	gtd->memory_stack->max++;
+
+	str_ptr->max = size + 1;
+	str_ptr->len = 0;
+
+	str = (char *) str_ptr + sizeof(struct str_data);
+
+	*str = 0;
+
+	return str;
+}

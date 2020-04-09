@@ -1046,6 +1046,7 @@ struct tintin_data
 	struct screen_data    * screen;
 	struct level_data     * level;
 	struct str_data       * memory;
+	struct str_data       * memory_stack;
 	char                  * detach_file;
 	int                     detach_port;
 	struct process_data     detach_info;

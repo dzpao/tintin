@@ -773,6 +773,8 @@ int check_all_prompts(struct session *ses, char *original, char *line, int check
 			{
 				substitute(ses, node->arg2, original, SUB_ARG);
 				substitute(ses, original, original, SUB_VAR|SUB_FUN|SUB_COL|SUB_ESC);
+
+				strip_vt102_codes(original, line);
 			}
 
 			show_debug(ses, LIST_PROMPT, "#DEBUG PROMPT {%s}", node->arg1);
@@ -886,7 +888,7 @@ void check_all_substitutions(struct session *ses, char *original, char *line)
 
 				show_debug(ses, LIST_SUBSTITUTE, "#DEBUG SUBSTITUTE {%s} {%s}", node->arg1, match);
 			}
-			while (check_one_regexp(ses, node, ptl, pto, 0));
+			while (*pto && check_one_regexp(ses, node, ptl, pto, 0));
 
 			if (node->shots && --node->shots == 0)
 			{

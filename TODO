@@ -6,7 +6,9 @@
 
   - Add a SPLIT drawing catch event
 
-  - Fix SEND OUTPUT capture in 2UTF8 modes.
+  - #draw Ebony tile {-1-$input[width]} 1 -2 -1 check space handling
+
+  - look into \e\n \e\cj issue
 
 * STUFF THAT IS PROBABLY GONNA GET DONE
 

@@ -430,6 +430,7 @@ void init_tintin(int greeting)
 	gtd->level          = (struct level_data *) calloc(1, sizeof(struct level_data));
 
 	gtd->memory         = calloc(1, sizeof(struct str_data));
+	gtd->memory_stack   = calloc(1, sizeof(struct str_data));
 
 	gtd->buf            = str_alloc(STRING_SIZE);
 	gtd->out            = str_alloc(STRING_SIZE);

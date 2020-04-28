@@ -1,5 +1,7 @@
 #!./tt++ -G
 
+#format start %U
+
 #math error 0
 
 #alias error
@@ -162,11 +164,95 @@
 
 #nop ----------
 
+#if {"$arglebargle" != "\$arglebargle"}
+{
+	error 20: unassigned variable
+}
+
+#nop ----------
+
+#alias {bla} {error 21: unalias malfunction}
+#alias {bla%*} {#nop}
+#unalias {bla}
+bla
+#unalias {bla%*}
+
+
+#nop ----------
+#action {bla} #nop
+#unact bla
+#alias {bla} #nop
+#unalias bla
+#bell volume 8
+#buffer get bla -1 -1;
+#button {1;1;2;2} {#nop}
+#unbutton {1;1;2;2}
+#cat bla bli
+#line quiet #chat init 0
+#chat uninit
+#class bla open
+#class bla kill
+#cursor get bla
+#line quiet #daemon list
+#line quiet {#debug all on;#debug all off};
+#line quiet #dictionary bla
+#line quiet #dictionary hello
+#draw green tile 1 -1 1 -1
+#format bla {}
+#fun bla {#nop}
+#unfun bla
+#line quiet #help %*
+#high bla green
+#unhigh bla
+#history insert bla
+#history delete
+#info system save
+#list bla create {a;b;c}
+#kill variable bla
+#loop 0 1 bla #nop
+#macro \e\e #nop
+#unmacro \e\e
+#line quiet #map create
+#line quiet #map destroy world
+#math bla 2+2
+#message all on
+#parse {abc} {bla} {#nop}
+#path create
+#path destroy
+#pathdir bla bli
+#unpathdir bla
+#line quiet #port init bla 0
+#all #nop
+#line quiet #port uninit
+#prompt bla bli
+#unprompt bla
+#regex {bla} {bla} {#nop} {#nop}
+#var bla x
+#replace bla x y
+#screen get cols bla
+#snoop bla
+#line quiet #split
+#unsplit
+#sub bla bli
+#unsub bla
+#tab bla bli
+#untab bla
+#tick bla {#nop} 1
+#untick bla
+
+#format end %U;
+
+#nop ----------
+
+#function time
+{
+	#math result ($end - start) / 1000000.000
+}
+
 #if {$error}
 {
     #end <118>End of validation with $error errors.<088>
 }
 {
-    #end <128>End of validation with 0 errors.<088>
+    #end <128>End of validation with 0 errors in @time{} seconds.<088>
 }
-

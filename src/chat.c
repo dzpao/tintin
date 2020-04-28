@@ -70,13 +70,15 @@ extern struct chat_data *find_group(char *arg);
 
 DO_COMMAND(do_chat)
 {
-	char cmd[BUFFER_SIZE], arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
+	char cmd[BUFFER_SIZE];
 	int cnt;
 
 	arg = get_arg_in_braces(ses, arg, cmd, GET_ONE);
 
 	if (*cmd == 0)
 	{
+		info:
+
 		tintin_header(ses, " CHAT OPTIONS ");
 
 		for (cnt = 0 ; *chat_table[cnt].name != 0 ; cnt++)
@@ -110,7 +112,7 @@ DO_COMMAND(do_chat)
 		return ses;
 	}
 
-	do_chat(ses, "");
+	goto info;
 
 	return ses;
 }
@@ -204,7 +206,7 @@ DO_CHAT(chat_uninitialize)
 
 	gtd->chat = NULL;
 
-	tintin_printf(NULL, "#OK: Uninitialized chat on port %d.", port);
+	show_message(gtd->ses, LIST_COMMAND, "#OK: UNINITIALIZED CHAT ON PORT %d.", port);
 }
 
 
@@ -721,25 +723,32 @@ void chat_socket_printf(struct chat_data *buddy, char *format, ...)
 void chat_printf(char *format, ...)
 {
 	struct chat_data *buddy;
-	char buf[STRING_SIZE], tmp[STRING_SIZE];
+	char *buf, *tmp;
 	va_list args;
+
+	push_call("chat_printf(%p,...)",format);
+
+	buf = str_alloc_stack();
+	tmp = str_alloc_stack();
 
 	va_start(args, format);
 	vsnprintf(buf, BUFFER_SIZE / 3, format, args);
 	va_end(args);
 
+	str_fix(buf);
+
 	if (strncmp(buf, gtd->chat->prefix, strlen(gtd->chat->prefix)))
 	{
-		sprintf(tmp, "%s%s", gtd->chat->prefix, buf);
+		str_cpy_printf(&tmp, "%s%s", gtd->chat->prefix, buf);
 	}
 	else
 	{
-		sprintf(tmp, "%s", buf);
+		str_cpy_printf(&tmp, "%s", buf);
 	}
 
 	strip_vt102_codes_non_graph(tmp, buf);
 
-	sprintf(tmp, "%c%s%c", CHAT_SNOOP_DATA, buf, CHAT_END_OF_COMMAND);
+	str_cpy_printf(&tmp, "%c%s%c", CHAT_SNOOP_DATA, buf, CHAT_END_OF_COMMAND);
 
 	for (buddy = gtd->chat->next ; buddy ; buddy = buddy->next)
 	{
@@ -748,7 +757,7 @@ void chat_printf(char *format, ...)
 			chat_socket_printf(buddy, "%s", tmp);
 		}
 	}
-	sprintf(tmp, "%s%s%s", gtd->chat->color, buf, "\e[0m");
+	str_cpy_printf(&tmp, "%s%s%s", gtd->chat->color, buf, "\e[0m");
 
 	check_all_events(gtd->ses, SUB_ARG|SUB_SEC, 0, 2, "CHAT MESSAGE", tmp, buf);
 
@@ -756,6 +765,8 @@ void chat_printf(char *format, ...)
 	{
 		tintin_puts(NULL, tmp);
 	}
+	pop_call();
+	return;
 }
 
 
@@ -2223,15 +2234,17 @@ DO_CHAT(chat_cancelfile)
 
 DO_CHAT(chat_color)
 {
-	if (*arg1 == 0 || get_color_names(gtd->ses, arg1, arg2) == FALSE)
+	if (*arg1 == 0 || !is_color_name(arg1))
 	{
 		chat_printf("Valid colors are:\n\nreset, bold, dim, light, dark, underscore, blink, reverse, black, red, green, yellow, blue, magenta, cyan, white, b black, b red, b green, b yellow, b blue, b magenta, b cyan, b white");
 
 		return;
 	}
+	get_color_names(gtd->ses, arg1, arg2);
+
 	RESTRING(gtd->chat->color, arg2);
 
-	chat_printf("Color has been set to %s", arg1);
+	chat_printf("Color has been set to %s.", arg1);
 }
 
 DO_CHAT(chat_dnd)

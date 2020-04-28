@@ -267,6 +267,33 @@ char *c32_fg_bold[26] =
 	"", "<ff80>", "<ff08>", "", "<ff00>", "<fddd>", "<fdb0>", "", "<f80f>", "<ffff>", "", "<fff0>", ""
 };
 
+int valid_escape(struct session *ses, char *str)
+{
+	switch (*str)
+	{
+		case '0':
+		case 'a':
+		case 'c':
+		case 'e':
+		case 'f':
+		case 'n':
+		case 'r':
+		case 't':
+		case 'x':
+		case 'u':
+		case 'U':
+		case 'v':
+		case ';':
+		case '$':
+		case '@':
+		case '*':
+		case '&':
+		case '\\':
+			return TRUE;
+	}
+	return FALSE;
+}
+
 int is_variable(struct session *ses, char *str)
 {
 	struct listroot *root;
@@ -354,84 +381,6 @@ int is_function(struct session *ses, char *str)
 	return TRUE;
 }
 
-int is_color_code(char *pti)
-{
-	if (pti[0] == '<')
-	{
-		if (pti[1] == 0 || pti[2] == 0 || pti[3] == 0 || pti[4] == 0)
-		{
-			return 0;
-		}
-
-		if (pti[4] == '>')
-		{
-
-			if (isdigit((int) pti[1]) && isdigit((int) pti[2]) && isdigit((int) pti[3]))
-			{
-				return 5;
-			}
-			if (pti[1] >= 'a' && pti[1] <= 'f' && pti[2] >= 'a' && pti[2] <= 'f' && pti[3] >= 'a' && pti[3] <= 'f')
-			{
-				return 5;
-			}
-			if (pti[1] >= 'A' && pti[1] <= 'F' && pti[2] >= 'A' && pti[2] <= 'F' && pti[3] >= 'A' && pti[3] <= 'F')
-			{
-				return 5;
-			}
-
-			if (pti[1] == 'g' || pti[1] == 'G')
-			{
-				if (isdigit((int) pti[2]) && isdigit((int) pti[3]))
-				{
-					return 5;
-				}
-				return 0;
-			}
-
-			return 0;
-		}
-
-		if (pti[5] == 0)
-		{
-			return 0;
-		}
-
-		if (toupper((int) pti[1]) == 'F')
-		{
-			if (isxdigit((int) pti[2]) && isxdigit((int) pti[3]) && isxdigit((int) pti[4]) && pti[5] == '>')
-			{
-				return 6;
-			}
-			else if (pti[2] == '?' && pti[3] == '?' && pti[4] == '?' && pti[5] == '>')
-			{
-				return 6;
-			}
-			else if (isxdigit((int) pti[2]) && isxdigit((int) pti[3]) && isxdigit((int) pti[4]) && isxdigit((int) pti[5]) && isxdigit((int) pti[6]) && isxdigit((int) pti[7]) && pti[8] == '>')
-			{
-				return 9;
-			}
-			return 0;
-		}
-
-		if (toupper((int) pti[1]) == 'B')
-		{
-			if (isxdigit((int) pti[2]) && isxdigit((int) pti[3]) && isxdigit((int) pti[4]) && pti[5] == '>')
-			{
-				return 6;
-			}
-			if (toupper((int) pti[1]) == 'B' && pti[2] == '?' && pti[3] == '?' && pti[4] == '?' && pti[5] == '>')
-			{
-				return 6;
-			}
-			if (toupper((int) pti[1]) == 'B' && isxdigit((int) pti[2]) && isxdigit((int) pti[3]) && isxdigit((int) pti[4]) && isxdigit((int) pti[5]) && isxdigit((int) pti[6]) && isxdigit((int) pti[7]) && pti[8] == '>')
-			{
-				return 9;
-			}
-			return 0;
-		}
-	}
-	return 0;
-}
 
 
 char *fuzzy_char(struct session *ses, char val1, char val2, int mode)
@@ -1837,6 +1786,7 @@ int substitute(struct session *ses, char *string, char *result, int flags)
 								pti += 4;
 							}
 							break;
+
 						case 'U':
 							if (pti[1] && pti[2] && pti[3] && pti[4] && pti[5] && pti[6])
 							{
@@ -1952,4 +1902,360 @@ int substitute(struct session *ses, char *string, char *result, int flags)
 	}
 	pop_call();
 	return 0;
+}
+
+int is_color_code(char *pti)
+{
+	if (pti[0] == '<')
+	{
+		if (pti[1] == 0 || pti[2] == 0 || pti[3] == 0 || pti[4] == 0)
+		{
+			return 0;
+		}
+
+		if (pti[4] == '>')
+		{
+
+			if (isdigit((int) pti[1]) && isdigit((int) pti[2]) && isdigit((int) pti[3]))
+			{
+				return 5;
+			}
+			if (pti[1] >= 'a' && pti[1] <= 'f' && pti[2] >= 'a' && pti[2] <= 'f' && pti[3] >= 'a' && pti[3] <= 'f')
+			{
+				return 5;
+			}
+			if (pti[1] >= 'A' && pti[1] <= 'F' && pti[2] >= 'A' && pti[2] <= 'F' && pti[3] >= 'A' && pti[3] <= 'F')
+			{
+				return 5;
+			}
+
+			if (pti[1] == 'g' || pti[1] == 'G')
+			{
+				if (isdigit((int) pti[2]) && isdigit((int) pti[3]))
+				{
+					return 5;
+				}
+				return 0;
+			}
+
+			return 0;
+		}
+
+		if (pti[5] == 0)
+		{
+			return 0;
+		}
+
+		if (toupper((int) pti[1]) == 'F')
+		{
+			if (isxdigit((int) pti[2]) && isxdigit((int) pti[3]) && isxdigit((int) pti[4]) && pti[5] == '>')
+			{
+				return 6;
+			}
+			else if (pti[2] == '?' && pti[3] == '?' && pti[4] == '?' && pti[5] == '>')
+			{
+				return 6;
+			}
+			else if (isxdigit((int) pti[2]) && isxdigit((int) pti[3]) && isxdigit((int) pti[4]) && isxdigit((int) pti[5]) && isxdigit((int) pti[6]) && isxdigit((int) pti[7]) && pti[8] == '>')
+			{
+				return 9;
+			}
+			return 0;
+		}
+
+		if (toupper((int) pti[1]) == 'B')
+		{
+			if (isxdigit((int) pti[2]) && isxdigit((int) pti[3]) && isxdigit((int) pti[4]) && pti[5] == '>')
+			{
+				return 6;
+			}
+			if (toupper((int) pti[1]) == 'B' && pti[2] == '?' && pti[3] == '?' && pti[4] == '?' && pti[5] == '>')
+			{
+				return 6;
+			}
+			if (toupper((int) pti[1]) == 'B' && isxdigit((int) pti[2]) && isxdigit((int) pti[3]) && isxdigit((int) pti[4]) && isxdigit((int) pti[5]) && isxdigit((int) pti[6]) && isxdigit((int) pti[7]) && pti[8] == '>')
+			{
+				return 9;
+			}
+			return 0;
+		}
+	}
+	return 0;
+}
+
+int is_color_name(char *string)
+{
+	int cnt, skip;
+
+	while (*string)
+	{
+		switch (*string)
+		{
+			case ' ':
+			case ';':
+			case ',':
+				string++;
+				continue;
+
+			case '<':
+				skip = is_color_code(string);
+
+				if (skip == 0)
+				{
+					return FALSE;
+				}
+				string += skip;
+				continue;
+
+			case '\\':
+				skip = find_escaped_color_code(string);
+
+				if (skip == 0)
+				{
+					return FALSE;
+				}
+				string += skip;
+				continue;
+
+			case '\e':
+				skip = find_color_code(string);
+
+				if (skip == 0)
+				{
+					return FALSE;
+				}
+				string += skip;
+				continue;
+		}
+
+		if (isalpha((int) *string))
+		{
+			for (cnt = 0 ; *color_table[cnt].name ; cnt++)
+			{
+				if (!strncmp(color_table[cnt].name, string, color_table[cnt].len))
+				{
+					break;
+				}
+			}
+
+			if (*color_table[cnt].name == 0)
+			{
+				for (cnt = 0 ; *color_table[cnt].name ; cnt++)
+				{
+					if (!strncasecmp(color_table[cnt].name, string, color_table[cnt].len))
+					{
+						break;
+					}
+				}
+
+				if (*color_table[cnt].name == 0)
+				{
+					return FALSE;
+				}
+			}
+			string += strlen(color_table[cnt].name);
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+int translate_color_names(struct session *ses, char *string, char *result)
+{
+	int cnt, skip;
+
+	*result = 0;
+
+	while (*string)
+	{
+		switch (*string)
+		{
+			case ' ':
+			case ';':
+			case ',':
+				string++;
+				continue;
+
+			case '<':
+				skip = is_color_code(string);
+
+				if (skip == 0)
+				{
+					return FALSE;
+				}
+				result += sprintf(result, "%.*s", skip, string);
+
+				string += skip;
+				continue;
+
+			case '\\':
+				skip = find_escaped_color_code(string);
+
+				if (skip == 0)
+				{
+					return FALSE;
+				}
+				result += sprintf(result, "%.*s", skip, string);
+
+				string += skip;
+				continue;
+
+			case '\e':
+				skip = find_color_code(string);
+
+				if (skip == 0)
+				{
+					return FALSE;
+				}
+				result += sprintf(result, "%.*s", skip, string);
+
+				string += skip;
+				continue;
+		}
+
+		if (isalpha((int) *string))
+		{
+			for (cnt = 0 ; *color_table[cnt].name ; cnt++)
+			{
+				if (!strncmp(color_table[cnt].name, string, color_table[cnt].len))
+				{
+					result += sprintf(result, "%s", color_table[cnt].code);
+
+					break;
+				}
+			}
+
+			if (*color_table[cnt].name == 0)
+			{
+				for (cnt = 0 ; *color_table[cnt].name ; cnt++)
+				{
+					if (!strncasecmp(color_table[cnt].name, string, color_table[cnt].len))
+					{
+						result += sprintf(result, "%s", color_table[cnt].code);
+
+						break;
+					}
+				}
+
+				if (*color_table[cnt].name == 0)
+				{
+					return FALSE;
+				}
+			}
+			string += strlen(color_table[cnt].name);
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+int get_color_names(struct session *ses, char *string, char *result)
+{
+	int cnt, skip;
+
+	*result = 0;
+
+	while (*string)
+	{
+		switch (*string)
+		{
+			case ' ':
+			case ';':
+			case ',':
+				string++;
+				continue;
+
+			case '<':
+				skip = is_color_code(string);
+
+				if (skip == 0)
+				{
+					return FALSE;
+				}
+				string += sprintf(result, "%.*s", skip, string);
+
+				result += substitute(ses, result, result, SUB_COL);
+
+				continue;
+			
+			case '\\':
+				skip = find_escaped_color_code(string);
+
+				if (skip == 0)
+				{
+					string++;
+					if (*string)
+					{
+						*result++ = *string++;
+					}
+				}
+				string += sprintf(result, "%.*s", skip, string);
+
+				result += substitute(ses, result, result, SUB_ESC);
+
+				continue;
+
+			case '\e':
+				skip = find_color_code(string);
+
+				if (skip == 0)
+				{
+					return FALSE;
+				}
+				result += sprintf(result, "%.*s", skip, string);
+
+				string += skip;
+
+				continue;
+		}
+
+		if (isalpha((int) *string))
+		{
+			for (cnt = 0 ; *color_table[cnt].name ; cnt++)
+			{
+				if (!strncmp(color_table[cnt].name, string, color_table[cnt].len))
+				{
+					substitute(ses, color_table[cnt].code, result, SUB_COL);
+
+					result += strlen(result);
+
+					break;
+				}
+			}
+
+			if (*color_table[cnt].name == 0)
+			{
+				for (cnt = 0 ; *color_table[cnt].name ; cnt++)
+				{
+					if (!strncasecmp(color_table[cnt].name, string, color_table[cnt].len))
+					{
+						substitute(ses, color_table[cnt].code, result, SUB_COL);
+
+						result += strlen(result);
+
+						break;
+					}
+				}
+
+				if (*color_table[cnt].name == 0)
+				{
+					return FALSE;
+				}
+			}
+			string += strlen(color_table[cnt].name);
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+	*result = 0;
+
+	return TRUE;
 }

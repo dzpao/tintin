@@ -1,32 +1,37 @@
 * BUGS
 
-  - Make #line capture work with #showme
+  - #if {!(0)} {#showme 1} {#showme 0}
 
-  - Make CHARSET bi-directional
+  - does not work if I am not in the map. Before it was working normally. Is it expected behavior? It was kind of unexpected to me.
 
-  - Add a SPLIT drawing catch event
+  - color code #help {} by type
 
-  - #draw Ebony tile {-1-$input[width]} 1 -2 -1 check space handling
-
-  - look into \e\n \e\cj issue
+  - Add screen and line clear VT events
 
 * STUFF THAT IS PROBABLY GONNA GET DONE
 
-  - multi-line buffer searches / captures
+  - Add #line gag 2 +2 -2 support.
 
-  - #line multishot support
+  - multi-line buffer searches / captures / deletes
 
   - add color based auto unwrap routine.
 
   - Work on VT2020 protocol (mouse click)
 
   - $var[%*][%*] support.
+  - make list sorting move nests as well
 
   - #line convert utf-8 support.
+
+  - Start of line anchors aren't working in #replace.
 
   - better #draw font support
 
   - case insensitive tabbing (partial start with rewrite)
+  - tabbing on directory structure.
+  - tabbing on dictionary
+
+  - Enhance #scan with a scan of the directory structure.
 
   - finish landmarks
   - map sandbox mode support (flags to disable saving?)
@@ -40,6 +45,12 @@
   - add maze flag for maze handling.
   - Request: aura around the character position. Something similar to terrain dense narrow. Could improve visibility of the character position on big resolutions. Furthermor config to allow modification of the character terrain. 
   - vt map doesn't utilize all available space.
+  - Request: 'stop' #map center command, so i could see how the 'user' moves, rather map moves around him? 
+  - #map uninsert <vnum>
+  - make map spacing easier
+  - add configurable default symbol
+  - exit symbol?
+  - more data to #map list saving, and maybe easier sorting of tables.
 
   - #draw table {1;2;3;4} {a;b;c;d} 
     #draw scrollbar
@@ -48,6 +59,7 @@
     #draw titanic
 
   - proper vt100 skip detection for improper color codes.
+  - look into VT100 / #split hybrid mode.
 
   - I'll look and see if I can make { match both a { and \x7B as it's an annoying issue to debug.
 
@@ -65,7 +77,7 @@
   - more potent long-click handling including held down ticks.
 
   - look into discord api / arachnos
-
+ 
   - better color syntax highlighting configuration.
 
   - Add #log delete option.

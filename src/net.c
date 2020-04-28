@@ -201,6 +201,14 @@ void write_line_mud(struct session *ses, char *line, int size)
 
 	push_call("write_line_mud(%p,%p)",line,ses);
 
+	check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "SEND OUTPUT", line, ntos(size));
+
+	if (check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "CATCH SEND OUTPUT", line, ntos(size)))
+	{
+		pop_call();
+		return;
+	}
+
 	if (ses == gts)
 	{
 		if (HAS_BIT(gtd->flags, TINTIN_FLAG_CHILDLOCK))
@@ -223,15 +231,6 @@ void write_line_mud(struct session *ses, char *line, int size)
 		return;
 	}
 
-
-
-	if (check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "CATCH SEND OUTPUT", line, ntos(size)))
-	{
-		pop_call();
-		return;
-	}
-
-	check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "SEND OUTPUT", line, ntos(size));
 
 	if (!HAS_BIT(ses->telopts, TELOPT_FLAG_TELNET) && HAS_BIT(ses->charset, CHARSET_FLAG_ALL_TOUTF8))
 	{
@@ -363,11 +362,13 @@ void readmud(struct session *ses)
 
 	if (gtd->mud_output_len < BUFFER_SIZE)
 	{
+		check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "RECEIVED OUTPUT", gtd->mud_output_buf);
+
 		if (check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "CATCH RECEIVED OUTPUT", gtd->mud_output_buf))
 		{
+			pop_call();
 			return;
 		}
-		check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "RECEIVED OUTPUT", gtd->mud_output_buf);
 	}
 
 	/* separate into lines and print away */
@@ -554,12 +555,7 @@ void process_mud_output(struct session *ses, char *linebuf, int prompt)
 		return;
 	}
 
-	if (!check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "CATCH BUFFERED LINE", linebuf, line))
-	{
-		add_line_buffer(ses, linebuf, prompt);
-	}
-
-	check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "BUFFERED LINE", linebuf, line);
+	add_line_buffer(ses, linebuf, prompt);
 
 	if (ses == gtd->ses)
 	{

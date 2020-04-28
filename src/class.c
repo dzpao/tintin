@@ -29,7 +29,6 @@
 
 DO_COMMAND(do_class)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE], arg3[BUFFER_SIZE];
 	int i;
 	struct listroot *root;
 	struct listnode *node;
@@ -67,7 +66,7 @@ DO_COMMAND(do_class)
 
 		if (*class_table[i].name == 0)
 		{
-			show_error(ses, LIST_COMMAND, "#SYNTAX: CLASS {name} {OPEN|CLOSE|READ|SIZE|WRITE|KILL}.", arg1, capitalize(arg2));
+			show_error(ses, LIST_COMMAND, "#SYNTAX: CLASS {name} {OPEN|CLEAR|CLOSE|READ|SIZE|WRITE|KILL}.", arg1, capitalize(arg2));
 		}
 		else
 		{
@@ -75,6 +74,8 @@ DO_COMMAND(do_class)
 
 			if (node == NULL)
 			{
+				show_info(ses, LIST_CLASS, "#INFO: CLASS {%s} CREATED", arg1);
+
 				check_all_events(ses, SUB_ARG, 0, 1, "CLASS CREATED", arg1);
 
 				node = update_node_list(ses->list[LIST_CLASS], arg1, "", arg3, "");
@@ -250,7 +251,11 @@ DO_CLASS(class_load)
 
 		return ses;
 	}
+
 	file = fmemopen(node->data, (size_t) node->val32[1], "r");
+
+	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN LOADED FROM MEMORY.", arg1);
+//	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN LOADED FROM MEMORY (%d BYTES) (%s).", arg1, node->val32[1], node->data);
 
 	read_file(ses, file, arg1);
 
@@ -292,7 +297,7 @@ DO_CLASS(class_read)
 {
 	class_open(ses, node, arg1, arg2);
 
-	do_read(ses, arg2);
+	execute(ses, "#READ {%s}", arg2);
 
 	class_close(ses, node, arg1, arg2);
 
@@ -330,7 +335,8 @@ DO_CLASS(class_save)
 
 	fclose(file);
 
-	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN SAVED TO MEMORY (%d BYTES) (%s).", arg1, node->val32[1], node->data);
+	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN SAVED TO MEMORY.", arg1);
+//	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN SAVED TO MEMORY (%d BYTES) (%s).", arg1, node->val32[1], node->data);
 
 	return ses;
 }	

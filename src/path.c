@@ -30,13 +30,14 @@
 
 DO_COMMAND(do_path)
 {
-	char arg1[BUFFER_SIZE];
 	int cnt;
 
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 
 	if (*arg1 == 0)
 	{
+		info:
+
 		tintin_header(ses, " PATH OPTIONS ");
 
 		for (cnt = 0 ; *path_table[cnt].fun != NULL ; cnt++)
@@ -62,7 +63,7 @@ DO_COMMAND(do_path)
 
 		if (*path_table[cnt].name == 0)
 		{
-			do_path(ses, "");
+			goto info;
 		}
 		else
 		{
@@ -402,11 +403,11 @@ DO_PATH(path_load)
 
 		if ((node = search_node_list(root, temp)))
 		{
-			insert_node_list(root, node->arg1, node->arg2, "0", "");
+			create_node_list(root, node->arg1, node->arg2, "0", "");
 		}
 		else
 		{
-			insert_node_list(root, temp, temp, "0", "");
+			create_node_list(root, temp, temp, "0", "");
 		}
 	}
 	show_message(ses, LIST_COMMAND, "#PATH LOAD: PATH WITH %d NODES LOADED.", root->used);
@@ -448,7 +449,7 @@ DO_PATH(path_insert)
 	}
 	else
 	{
-		insert_node_list(root, arg1, arg2, "0", "");
+		create_node_list(root, arg1, arg2, "0", "");
 
 		show_message(ses, LIST_COMMAND, "#PATH INSERT: FORWARD {%s} BACKWARD {%s}.", arg1, arg2);
 
@@ -673,7 +674,7 @@ DO_PATH(path_zip)
 
 	kill_list(root);
 
-	insert_node_list(root, arg1, arg2, "0", "");
+	create_node_list(root, arg1, arg2, "0", "");
 
 	show_message(ses, LIST_COMMAND, "#PATH ZIP: THE PATH HAS BEEN ZIPPED TO {%s} {%s}.", arg1, arg2);
 }
@@ -681,8 +682,10 @@ DO_PATH(path_zip)
 DO_PATH(path_unzip)
 {
 	struct listroot *root = ses->list[LIST_PATH];
-	char arg1[BUFFER_SIZE], temp[BUFFER_SIZE], *str;
 	struct listnode *node;
+	char name[BUFFER_SIZE], num[NUMBER_SIZE], *ptn;
+	char arg1[BUFFER_SIZE];
+	int cnt, max;
 
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 
@@ -701,11 +704,63 @@ DO_PATH(path_unzip)
 
 	while (*arg)
 	{
-		if (*arg == ';')
+		switch (*arg)
 		{
-			arg++;
+			case ';':
+			case ' ':
+				arg++;
+				continue;
 		}
 
+		if (isdigit((int) *arg))
+		{
+			ptn = num;
+
+			while (isdigit((int) *arg))
+			{
+				if (ptn - num < 5)
+				{
+					*ptn++ = *arg++;
+				}
+				else
+				{
+					arg++;
+				}
+			}
+			*ptn = 0;
+
+			max = atoi(num);
+		}
+		else
+		{
+			max = 1;
+		}
+
+		arg = get_arg_stop_digits(ses, arg, name, GET_ONE);
+
+		if (*name == 0)
+		{
+			break;
+		}
+
+		node = search_node_list(ses->list[LIST_PATHDIR], name);
+
+		if (node)
+		{
+			for (cnt = 0 ; cnt < max ; cnt++)
+			{
+				create_node_list(root, node->arg1, node->arg2, "0", "");
+			}
+		}
+		else
+		{
+			for (cnt = 0 ; cnt < max ; cnt++)
+			{
+				create_node_list(root, name, name, "0", "");
+			}
+		}
+	}
+/*
 		arg = get_arg_in_braces(ses, arg, temp, GET_ALL);
 
 		if (is_speedwalk(ses, temp))
@@ -736,11 +791,11 @@ DO_PATH(path_unzip)
 				{
 					if ((node = search_node_list(ses->list[LIST_PATHDIR], dir)))
 					{
-						insert_node_list(root, node->arg1, node->arg2, "0", "");
+						create_node_list(root, node->arg1, node->arg2, "0", "");
 					}
 					else
 					{
-						insert_node_list(root, dir, dir, "0", "");
+						create_node_list(root, dir, dir, "0", "");
 					}
 				}
 			}
@@ -749,14 +804,15 @@ DO_PATH(path_unzip)
 		{
 			if ((node = search_node_list(ses->list[LIST_PATHDIR], temp)))
 			{
-				insert_node_list(root, node->arg1, node->arg2, "0", "");
+				create_node_list(root, node->arg1, node->arg2, "0", "");
 			}
 			else
 			{
-				insert_node_list(root, temp, temp, "0", "");
+				create_node_list(root, temp, temp, "0", "");
 			}
 		}
 	}
+*/
 	show_message(ses, LIST_COMMAND, "#PATH UNZIP: PATH WITH %d NODES UNZIPPED.", root->used);
 }
 
@@ -887,7 +943,7 @@ void check_append_path(struct session *ses, char *forward, char *backward, int f
 	{
 		if ((node = search_node_list(ses->list[LIST_PATHDIR], forward)))
 		{
-			insert_node_list(root, node->arg1, node->arg2, "0", "");
+			create_node_list(root, node->arg1, node->arg2, "0", "");
 
 			root->update = root->used;
 		}
@@ -896,11 +952,11 @@ void check_append_path(struct session *ses, char *forward, char *backward, int f
 	{
 		if ((node = search_node_list(ses->list[LIST_PATHDIR], forward)))
 		{
-			insert_node_list(root, node->arg1, node->arg2, "0", "");
+			create_node_list(root, node->arg1, node->arg2, "0", "");
 		}
 		else
 		{
-			insert_node_list(root, forward, backward, "0", "");
+			create_node_list(root, forward, backward, "0", "");
 		}
 	}
 }
@@ -908,7 +964,6 @@ void check_append_path(struct session *ses, char *forward, char *backward, int f
 
 DO_COMMAND(do_pathdir)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE], arg3[BUFFER_SIZE];
 	struct listnode *node;
 
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
@@ -959,8 +1014,6 @@ DO_COMMAND(do_pathdir)
 
 DO_COMMAND(do_unpathdir)
 {
-	char arg1[BUFFER_SIZE];
-
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 
 	do

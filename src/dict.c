@@ -139,7 +139,6 @@ int spellcheck_count(struct session *ses, char *in)
 
 DO_COMMAND(do_dictionary)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE], arg3[BUFFER_SIZE];
 	int hash, size, index;
 
 	sub_arg_in_braces(ses, arg, arg1, GET_ALL, SUB_VAR|SUB_FUN);

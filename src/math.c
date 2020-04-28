@@ -54,7 +54,6 @@ int precision;
 
 DO_COMMAND(do_math)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
 	struct listnode *node;
 	long double result;
 
@@ -399,6 +398,15 @@ int mathexp_tokenize(struct session *ses, char *str, int seed, int debug)
 					case '^':
 					case '|':
 					case '=':
+						if (pti == str)
+						{
+							if (debug)
+							{
+								show_debug(ses, LIST_VARIABLE, "#MATH EXP: EXPRESSION STARTED WITH AN OPERATOR.");
+							}
+							return FALSE;
+						}
+
 						if (pta != buf3)
 						{
 							MATH_NODE(FALSE, EXP_PR_VAR, EXP_OPERATOR);

@@ -29,12 +29,11 @@
 
 DO_COMMAND(do_configure)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
 	struct listnode *node;
 	int index;
 
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
-	arg = sub_arg_in_braces(ses, arg, arg2, GET_ONE, SUB_VAR|SUB_FUN);
+	arg = sub_arg_in_braces(ses, arg, arg2, GET_ALL, SUB_VAR|SUB_FUN);
 
 	if (*arg1 == 0)
 	{
@@ -362,12 +361,8 @@ DO_CONFIG(config_commandcolor)
 {
 	if (*arg2)
 	{
-		if (!get_color_names(ses, arg2, arg1))
-		{
-			show_error(ses, LIST_CONFIG, "#CONFIG COMMAND COLOR: INVALID COLOR CODE {%s}", arg2);
+		get_color_names(ses, arg2, arg1);
 
-			return NULL;
-		}
 		RESTRING(ses->cmd_color, arg1);
 	}
 	convert_meta(ses->cmd_color, arg2, SUB_EOL);
@@ -605,7 +600,6 @@ DO_CONFIG(config_mccp)
 	return ses;
 }
 
-
 DO_CONFIG(config_mousetracking)
 {
 	if (*arg2)
@@ -685,7 +679,7 @@ DO_CONFIG(config_packetpatch)
 {
 	if (*arg2)
 	{
-		if (is_abbrev(arg2, "AUTO"))
+		if (is_abbrev(arg2, "AUTO PROMPT") || is_abbrev(arg2, "AUTO TELNET") || is_abbrev(arg2, "AUTO OFF"))
 		{
 			ses->packet_patch = 0;
 

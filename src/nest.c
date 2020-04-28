@@ -882,7 +882,14 @@ struct listnode *set_nest_node_ses(struct session *ses, char *arg1, char *format
 
 	if (root == NULL)
 	{
-		root = ses->list[LIST_VARIABLE];
+		if (gtd->level->local)
+		{
+			root = local_list(ses);
+		}
+		else
+		{
+			root = ses->list[LIST_VARIABLE];
+		}
 		node = NULL;
 	}
 	else
@@ -926,7 +933,7 @@ struct listnode *set_nest_node_ses(struct session *ses, char *arg1, char *format
 
 	if (gtd->level->shots)
 	{
-		node->shots = gtd->level->shots;
+		node->shots = gtd->level->mshot;
 	}
 
 	check_all_events(root->ses, SUB_ARG, 1, 1, "VARIABLE UPDATED %s", name, name, arg2);
@@ -1006,7 +1013,7 @@ struct listnode *add_nest_node_ses(struct session *ses, char *arg1, char *format
 
 	if (gtd->level->shots)
 	{
-		node->shots = gtd->level->shots;
+		node->shots = gtd->level->mshot;
 	}
 
 	check_all_events(root->ses, SUB_ARG, 1, 1, "VARIABLE UPDATED %s", name, name, arg2);
@@ -1081,7 +1088,7 @@ struct listnode *set_nest_node(struct listroot *root, char *arg1, char *format, 
 
 	if (gtd->level->shots)
 	{
-		node->shots = gtd->level->shots;
+		node->shots = gtd->level->mshot;
 	}
 
 	check_all_events(root->ses, SUB_ARG, 1, 1, "VARIABLE UPDATED %s", name, name, arg2);
@@ -1160,7 +1167,7 @@ struct listnode *add_nest_node(struct listroot *root, char *arg1, char *format, 
 
 	if (gtd->level->shots)
 	{
-		node->shots = gtd->level->shots;
+		node->shots = gtd->level->mshot;
 	}
 
 	check_all_events(root->ses, SUB_ARG, 1, 1, "VARIABLE UPDATED %s", name, name, arg2);
@@ -1185,7 +1192,7 @@ void copy_nest_node(struct listroot *dst_root, struct listnode *dst, struct list
 
 	for (index = 0 ; index < src->root->used ; index++)
 	{
-		dst = insert_node_list(dst_root, src->root->list[index]->arg1, src->root->list[index]->arg2, src->root->list[index]->arg3, src->root->list[index]->arg4);
+		dst = create_node_list(dst_root, src->root->list[index]->arg1, src->root->list[index]->arg2, src->root->list[index]->arg3, src->root->list[index]->arg4);
 
 		if (src->root->list[index]->root)
 		{

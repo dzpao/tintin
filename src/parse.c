@@ -113,6 +113,46 @@ int is_suffix(char *str1, char *str2)
 	return FALSE;
 }
 
+int is_vowel(char *str)
+{
+	switch (case_table[(int) *str])
+	{
+		case 'a':
+		case 'e':
+		case 'i':
+		case 'o':
+		case 'u':
+			return TRUE;
+	}
+	return FALSE;
+}
+
+struct session *execute(struct session *ses, char *format, ...)
+{
+	char *buffer;
+	va_list args;
+
+	va_start(args, format);
+	vasprintf(&buffer, format, args);
+	va_end(args);
+
+	if (*buffer)
+	{
+		if (*buffer != gtd->tintin_char)
+		{
+			*buffer = gtd->tintin_char;
+		}
+		get_arg_all(ses, buffer, buffer, FALSE);
+	}
+
+	ses = script_driver(ses, LIST_COMMAND, buffer);
+
+	free(buffer);
+
+	return ses;
+}
+
+
 struct session *parse_input(struct session *ses, char *input)
 {
 	char *line;
@@ -286,7 +326,7 @@ char *substitute_speedwalk(struct session *ses, char *input, char *output)
 
 	return output;
 }
-	
+
 int is_speedwalk(struct session *ses, char *input)
 {
 	int digit = 0, flag = FALSE;
@@ -765,7 +805,6 @@ char *get_arg_stop_digits(struct session *ses, char *string, char *result, int f
 		}
 		else if (isdigit((int) *pti) && nest == 0)
 		{
-			pti++;
 			break;
 		}
 		else if (*pti == DEFAULT_OPEN)
@@ -1036,15 +1075,17 @@ void write_mud(struct session *ses, char *command, int flags)
 
 void do_one_line(char *line, struct session *ses)
 {
-	char strip[BUFFER_SIZE];
+	char *strip;
 
-	push_call("[%s] do_one_line(%s)",ses->name,line);
+	push_call("do_one_line(%s,%p)",ses->name,line);
 
 	if (gtd->level->ignore)
 	{
 		pop_call();
 		return;
 	}
+
+	strip = str_alloc_stack();
 
 	strip_vt102_codes(line, strip);
 
@@ -1079,6 +1120,7 @@ void do_one_line(char *line, struct session *ses)
 
 		DEL_BIT(ses->logmode, LOG_FLAG_NEXT);
 	}
+
 	pop_call();
 	return;
 }

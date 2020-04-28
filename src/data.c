@@ -122,10 +122,8 @@ struct listroot *copy_list(struct session *ses, struct listroot *sourcelist, int
 	return ses->list[type];
 }
 
-
-struct listnode *insert_node_list(struct listroot *root, char *arg1, char *arg2, char *arg3, char *arg4)
+struct listnode *create_node_list(struct listroot *root, char *arg1, char *arg2, char *arg3, char *arg4)
 {
-	int index;
 	struct listnode *node;
 
 	node = (struct listnode *) calloc(1, sizeof(struct listnode));
@@ -149,7 +147,7 @@ struct listnode *insert_node_list(struct listroot *root, char *arg1, char *arg2,
 
 	if (gtd->level->shots)
 	{
-		node->shots = gtd->level->shots;
+		node->shots = gtd->level->mshot;
 	}
 
 	node->group = HAS_BIT(root->flags, LIST_FLAG_CLASS) ? strdup(root->ses->group) : strdup("");
@@ -169,7 +167,14 @@ struct listnode *insert_node_list(struct listroot *root, char *arg1, char *arg2,
 			break;
 	}
 
-	index = locate_index_list(root, arg1, arg3);
+	return insert_node_list(root, node);
+}
+
+struct listnode *insert_node_list(struct listroot *root, struct listnode *node)
+{
+	int index;
+
+	index = locate_index_list(root, node->arg1, node->arg3);
 
 	return insert_index_list(root, node, index);
 }
@@ -186,19 +191,19 @@ struct listnode *update_node_list(struct listroot *root, char *arg1, char *arg2,
 	{
 		if (list_table[root->type].mode == SORT_DELAY && is_number(arg1))
 		{
-			return insert_node_list(root, arg1, arg2, arg3, arg4);
+			return create_node_list(root, arg1, arg2, arg3, arg4);
 		}
 
 		node = root->list[index];
 
 		if (gtd->level->shots)
 		{
-			node->shots = gtd->level->shots;
+			node->shots = gtd->level->mshot;
 		}
 
 		if (strcmp(node->arg2, arg2) != 0)
 		{
-			node->arg2 = str_cpy(&node->arg2, arg2);
+			str_cpy(&node->arg2, arg2);
 		}
 
 		switch (root->type)
@@ -214,38 +219,44 @@ struct listnode *update_node_list(struct listroot *root, char *arg1, char *arg2,
 			strcpy(arg3, "5");
 		}
 
+		if (strcmp(node->arg3, arg3) != 0)
+		{
+			str_cpy(&node->arg3, arg3);
+		}
+
+		if (strcmp(node->arg4, arg4) != 0)
+		{
+			str_cpy(&node->arg4, arg4);
+		}
+
 		switch (list_table[root->type].mode)
 		{
 			case SORT_PRIORITY:
 				if (atof(node->arg3) != atof(arg3))
 				{
-					delete_index_list(root, index);
-					return insert_node_list(root, arg1, arg2, arg3, arg4);
+					remove_index_list(root, index);
+					insert_node_list(root, node);
 				}
 				break;
 
 			case SORT_APPEND:
-				delete_index_list(root, index);
-				return insert_node_list(root, arg1, arg2, arg3, arg4);
+				remove_index_list(root, index);
+				insert_node_list(root, node);
 				break;
 
 			case SORT_ALPHA:
 			case SORT_DELAY:
-				if (strcmp(node->arg3, arg3) != 0)
-				{
-					str_cpy(&node->arg3, arg3);
-				}
 				break;
 
 			default:
-				tintin_printf2(root->ses, "#BUG: update_node_list: unknown mode: %d", list_table[root->type].mode);
+				tintin_printf2(root->ses, "#BUG: update_node_list: unknown sort: %d", list_table[root->type].mode);
 				break;
 		}
 		return node;
 	}
 	else
 	{
-		return insert_node_list(root, arg1, arg2, arg3, arg4);
+		return create_node_list(root, arg1, arg2, arg3, arg4);
 	}
 }
 
@@ -267,6 +278,27 @@ struct listnode *insert_index_list(struct listroot *root, struct listnode *node,
 	return node;
 }
 
+void remove_node_list(struct session *ses, int type, struct listnode *node)
+{
+	int index = search_index_list(ses->list[type], node->arg1, node->arg3);
+
+	remove_index_list(ses->list[type], index);
+}
+
+void remove_index_list(struct listroot *root, int index)
+{
+	if (index <= root->update)
+	{
+		root->update--;
+	}
+
+	memmove(&root->list[index], &root->list[index + 1], (root->used - index) * sizeof(struct listnode *));
+
+	root->used--;
+
+	return;
+}
+
 void delete_node_list(struct session *ses, int type, struct listnode *node)
 {
 	int index = search_index_list(ses->list[type], node->arg1, node->arg3);
@@ -281,11 +313,6 @@ void delete_index_list(struct listroot *root, int index)
 	if (node->root)
 	{
 		free_list(node->root);
-	}
-
-	if (index <= root->update)
-	{
-		root->update--;
 	}
 
 	str_free(node->arg1);
@@ -316,14 +343,9 @@ void delete_index_list(struct listroot *root, int index)
 			}
 			break;
 	}
-
 	free(node);
 
-	memmove(&root->list[index], &root->list[index + 1], (root->used - index) * sizeof(struct listnode *));
-
-	root->used--;
-
-	return;
+	remove_index_list(root, index);
 }
 
 struct listnode *search_node_list(struct listroot *root, char *text)
@@ -602,14 +624,26 @@ void show_list(struct listroot *root, int level)
 int show_node_with_wild(struct session *ses, char *text, struct listroot *root)
 {
 	struct listnode *node;
-	int i, found = FALSE;
+	int index, found = FALSE;
 
 	push_call("show_node_with_wild(%p,%p,%p)",ses,text,root);
 
-	node = search_node_list(root, text);
-
-	if (node)
+	switch (list_table[root->type].mode)
 	{
+		case SORT_ALPHA:
+		case SORT_DELAY:
+			index = bsearch_alpha_list(root, text, 0);
+			break;
+
+		default:
+			index = nsearch_list(root, text);
+			break;
+	}
+
+	if (index != -1)
+	{
+		node = root->list[index];
+
 		if (list_table[root->type].script_arg == 2)
 		{
 			if (list_table[root->type].args == 2)
@@ -674,11 +708,11 @@ int show_node_with_wild(struct session *ses, char *text, struct listroot *root)
 		return TRUE;
 	}
 
-	for (i = 0 ; i < root->used ; i++)
+	for (index = 0 ; index < root->used ; index++)
 	{
-		if (match(ses, root->list[i]->arg1, text, SUB_VAR|SUB_FUN))
+		if (match(ses, root->list[index]->arg1, text, SUB_VAR|SUB_FUN))
 		{
-			show_node(root, root->list[i], 0);
+			show_node(root, root->list[index], 0);
 
 			found = TRUE;
 		}
@@ -692,28 +726,40 @@ int delete_node_with_wild(struct session *ses, int type, char *text)
 	struct listroot *root = ses->list[type];
 	struct listnode *node;
 	char arg1[BUFFER_SIZE];
-	int i, found = FALSE;
+	int index, found = FALSE;
 
 	sub_arg_in_braces(ses, text, arg1, GET_ALL, SUB_VAR|SUB_FUN);
 
-	node = search_node_list(root, arg1);
-
-	if (node)
+	switch (list_table[type].mode)
 	{
+		case SORT_ALPHA:
+		case SORT_DELAY:
+			index = bsearch_alpha_list(root, arg1, 0);
+			break;
+
+		default:
+			index = nsearch_list(root, arg1);
+			break;
+	}
+
+	if (index != -1)
+	{
+		node = root->list[index];
+
 		show_message(ses, type, "#OK. {%s} IS NO LONGER %s %s.", node->arg1, (*list_table[type].name == 'A' || *list_table[type].name == 'E') ? "AN" : "A", list_table[type].name);
 
-		delete_node_list(ses, type, node);
+		delete_index_list(root, index);
 
 		return TRUE;
 	}
 
-	for (i = root->used - 1 ; i >= 0 ; i--)
+	for (index = root->used - 1 ; index >= 0 ; index--)
 	{
-		if (match(ses, root->list[i]->arg1, arg1, SUB_VAR|SUB_FUN))
+		if (match(ses, root->list[index]->arg1, arg1, SUB_VAR|SUB_FUN))
 		{
-			show_message(ses, type, "#OK. {%s} IS NO LONGER %s %s.", root->list[i]->arg1, (*list_table[type].name == 'A' || *list_table[type].name == 'E') ? "AN" : "A", list_table[type].name);
+			show_message(ses, type, "#OK. {%s} IS NO LONGER %s %s.", root->list[index]->arg1, is_vowel(list_table[type].name) ? "AN" : "A", list_table[type].name);
 
-			delete_index_list(root, i);
+			delete_index_list(root, index);
 
 			found = TRUE;
 		}
@@ -733,14 +779,13 @@ DO_COMMAND(do_killall)
 {
 	tintin_printf2(ses, "\e[1;31m#NOTICE: PLEASE CHANGE #KILLALL TO #KILL ALL.");
 
-	do_kill(ses, arg);
+	do_kill(ses, arg, arg1, arg2, arg3, arg4);
 
 	return ses;
 }
 
 DO_COMMAND(do_kill)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
 	int index;
 
 	arg = get_arg_in_braces(ses, arg, arg1, GET_ONE);
@@ -790,7 +835,6 @@ DO_COMMAND(do_kill)
 
 DO_COMMAND(do_message)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
 	int index, found = FALSE;
 
 	arg = get_arg_in_braces(ses, arg, arg1, GET_ONE);
@@ -858,7 +902,6 @@ DO_COMMAND(do_message)
 
 DO_COMMAND(do_ignore)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
 	int index, found = FALSE;
 
 	arg = get_arg_in_braces(ses, arg, arg1, GET_ONE);
@@ -926,7 +969,6 @@ DO_COMMAND(do_ignore)
 
 DO_COMMAND(do_debug)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
 	int index, found = FALSE;
 
 	arg = get_arg_in_braces(ses, arg, arg1, GET_ONE);
@@ -998,7 +1040,7 @@ DO_COMMAND(do_debug)
 
 DO_COMMAND(do_info)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE], name[BUFFER_SIZE];
+	char name[BUFFER_SIZE];
 	int cnt, index, found = FALSE;
 	struct listroot *root;
 
@@ -1102,6 +1144,29 @@ DO_COMMAND(do_info)
 				{
 					tintin_printf2(ses, "#INFO MCCP3: TOTAL IN: %9ull TOTAL OUT: %9ull RATIO: %3d", ses->mccp3->total_in, ses->mccp3->total_out, 100 * ses->mccp3->total_out / ses->mccp3->total_in);
 				}
+			}
+			else if (is_abbrev(arg1, "MEMORY"))
+			{
+				long long quan, used, max;
+				struct str_data *str;
+
+				max  = 0;
+				quan = 0;
+				used = 0;
+
+				for (str = gtd->memory->alloc->next ; str ; str = str->next)
+				{
+					max++;
+					quan += str->max;
+					used += str->len;
+				}
+
+				tintin_printf2(ses, "#INFO MEMORY: ALLOC  MAX: %d", max);
+				tintin_printf2(ses, "#INFO MEMORY: ALLOC QUAN: %d", quan);
+				tintin_printf2(ses, "#INFO MEMORY: ALLOC USED: %d", used);
+
+				tintin_printf2(ses, "#INFO MEMORY: STACK  MAX: %d", gtd->memory->stack_max);
+				tintin_printf2(ses, "#INFO MEMORY: STACK  LEN: %d", gtd->memory->stack_len);
 			}
 			else if (is_abbrev(arg1, "SESSION"))
 			{

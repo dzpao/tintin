@@ -86,10 +86,7 @@ void loginit(struct session *ses, FILE *file, int flags)
 
 DO_COMMAND(do_log)
 {
-	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
-
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
-
 	arg = sub_arg_in_braces(ses, arg, arg2, GET_ALL, SUB_VAR|SUB_FUN|SUB_ESC);
 
 	if (*arg1 == 0)

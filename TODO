@@ -2,6 +2,13 @@
 
   - #if {!(0)} {#showme 1} {#showme 0}
 
+#alias {k %1 with %2} {#echo %1;#echo %2}
+#ALIAS {k %1 with %2} NOW TRIGGERS {#echo %1;#echo %2} @ {5}.
+k fox with axe
+fox
+axe
+k blue fox with axe
+
   - does not work if I am not in the map. Before it was working normally. Is it expected behavior? It was kind of unexpected to me.
 
   - color code #help {} by type
@@ -51,6 +58,8 @@
   - add configurable default symbol
   - exit symbol?
   - more data to #map list saving, and maybe easier sorting of tables.
+  - event for failed #map move.
+  - look into #send triggering follow map.
 
   - #draw table {1;2;3;4} {a;b;c;d} 
     #draw scrollbar

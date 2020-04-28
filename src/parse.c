@@ -1049,7 +1049,7 @@ void write_mud(struct session *ses, char *command, int flags)
 
 	size = substitute(ses, command, output, flags);
 
-	if (HAS_BIT(ses->flags, SES_FLAG_PATHMAPPING))
+	if (gtd->level->ignore == 0 && HAS_BIT(ses->flags, SES_FLAG_PATHMAPPING))
 	{
 		if (ses->map == NULL || ses->map->nofollow == 0)
 		{
@@ -1057,7 +1057,7 @@ void write_mud(struct session *ses, char *command, int flags)
 		}
 	}
 
-	if (ses->map && ses->map->in_room && ses->map->nofollow == 0)
+	if (gtd->level->ignore == 0 && ses->map && ses->map->in_room && ses->map->nofollow == 0)
 	{
 		if (follow_map(ses, command))
 		{

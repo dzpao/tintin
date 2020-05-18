@@ -1,27 +1,31 @@
 * BUGS
 
-  - #if {!(0)} {#showme 1} {#showme 0}
+  - Editor
 
-#alias {k %1 with %2} {#echo %1;#echo %2}
-#ALIAS {k %1 with %2} NOW TRIGGERS {#echo %1;#echo %2} @ {5}.
-k fox with axe
-fox
-axe
-k blue fox with axe
+  - make #line quiet #line capture work.
 
-  - does not work if I am not in the map. Before it was working normally. Is it expected behavior? It was kind of unexpected to me.
-
-  - color code #help {} by type
+  - improve screen fill default
 
   - Add screen and line clear VT events
 
+  - Add easy way to check if session is foreground.
+
+  - check that desktop dimensions are inherited by sessions
+
+  - memory allocation error check.
+
+  - example script for two sessions in one screen.
+
 * STUFF THAT IS PROBABLY GONNA GET DONE
 
+  - if error pcre.h, need export C_INCLUDE_PATH= where it locate
+
+  - #write table variables a bit nicer.
+
+  - The #else command could follow a #foreach so as to create "for-else" loops
+    in case a loop is not broken.
+
   - Add #line gag 2 +2 -2 support.
-
-  - multi-line buffer searches / captures / deletes
-
-  - add color based auto unwrap routine.
 
   - Work on VT2020 protocol (mouse click)
 
@@ -29,8 +33,6 @@ k blue fox with axe
   - make list sorting move nests as well
 
   - #line convert utf-8 support.
-
-  - Start of line anchors aren't working in #replace.
 
   - better #draw font support
 
@@ -60,8 +62,11 @@ k blue fox with axe
   - more data to #map list saving, and maybe easier sorting of tables.
   - event for failed #map move.
   - look into #send triggering follow map.
+  - truncate prompt longer than split.
 
-  - #draw table {1;2;3;4} {a;b;c;d} 
+  - Make actions with a priority of 0. trigger always
+
+  - #draw table {1;2;3;4} {a;b;c;d}
     #draw scrollbar
     #draw graph
     #draw button
@@ -80,7 +85,6 @@ k blue fox with axe
 
   - class bla assign {stuff} feature?
   - add class specific debug
-  - allow #class save/load to memory.
   - better class event and class size handling ?
 
   - more potent long-click handling including held down ticks.
@@ -89,8 +93,7 @@ k blue fox with axe
  
   - better color syntax highlighting configuration.
 
-  - Add #log delete option.
-  - Fix #log helpfile and look into #log {remove} option for wintin++
+  - Add #log delete/remove option.
 
   - See about filling COMMAND_LIST table.
 
@@ -145,6 +148,16 @@ k blue fox with axe
   - http://tintin.sourceforge.net/board/viewtopic.php?p=8745#8745 (verbose logging?)
 
   - See about adding ~/ handling for file names.
+
+--------------------------------------------------------------------------------
+
+* LOW PRIORITY
+
+  - multi-line buffer searches / captures / deletes
+
+  - add color based auto unwrap routine.
+
+  - Start of line anchors aren't working in #replace.
 
 --------------------------------------------------------------------------------
 
@@ -274,18 +287,6 @@ k blue fox with axe
 
 - look into Launchpad PPA
 
-- Chat server script 'log' option to show last 15 messages.
-
-* Other stuff that's not overly interesting
-
-- look into getting rid of node->data
-
-- Look into old school automatic packet patching.
-
-- Add a ARG_LEN / ARG_MAX setting.
-
-- Add a #line skip option.
-
 --------------------------------------------------------------------------------
 
 * STUFF FOR A RAINY DAY
@@ -329,3 +330,11 @@ k blue fox with axe
 - map sharing
 - cursor extension for vim
 - interactive script tutorial
+
+-------------------------------------------------------------------------------
+
+* ISSUES
+
+- TinTin++ only allows 1 action triggering per line.
+
+- TinTin++ probably should substitute escapes in if checks.

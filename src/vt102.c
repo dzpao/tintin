@@ -583,7 +583,7 @@ int skip_vt102_codes_non_graph(char *str)
 	return 0;
 }
 
-void strip_vt102_codes(char *str, char *buf)
+int strip_vt102_codes(char *str, char *buf)
 {
 	char *pti, *pto;
 
@@ -603,6 +603,8 @@ void strip_vt102_codes(char *str, char *buf)
 		}
 	}
 	*pto = 0;
+
+	return pto - buf;
 }
 
 

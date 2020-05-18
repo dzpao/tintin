@@ -1373,7 +1373,7 @@ int client_recv_sb_charset(struct session *ses, int cplen, unsigned char *src)
 		return cplen + 1;
 	}
 
-	client_telopt_debug(ses, "RCVD IAC SB CHARSET %d %d", src[3], src[4]);
+//	client_telopt_debug(ses, "RCVD IAC SB CHARSET %d %d", src[3], src[4]);
 
 	i = 5;
 
@@ -1565,7 +1565,7 @@ int client_recv_sb_new_environ(struct session *ses, int cplen, unsigned char *sr
 		return cplen + 1;
 	}
 
-	client_telopt_debug(ses, "RCVD IAC SB NEW-ENVIRON %d %d", src[3], src[4]);
+//	client_telopt_debug(ses, "RCVD IAC SB NEW-ENVIRON %d %d", src[3], src[4]);
 
 	switch (src[3])
 	{
@@ -2101,9 +2101,15 @@ void client_end_mccp2(struct session *ses)
 		return;
 	}
 
-	if (deflateEnd(ses->mccp2) != Z_OK)
+	ses->mccp2->next_in     = NULL;
+	ses->mccp2->avail_in    = 0;
+
+	ses->mccp2->next_out    = gtd->mccp_buf;
+	ses->mccp2->avail_out   = gtd->mccp_len;
+
+	if (deflateEnd(ses->mccp2) == Z_STREAM_ERROR)
 	{
-		tintin_printf2(ses, "MCCP2: FAILED TO DEFLATE_END");
+		client_telopt_debug(ses, "MCCP2: deflateEnd failed:");
 	}
 
 	free(ses->mccp2);

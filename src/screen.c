@@ -944,15 +944,15 @@ void csit_handler(int ind, int var1, int var2)
 	switch (ind)
 	{
 		case 1:
-			gtd->screen->minimized = 1;
-			check_all_events(NULL, SUB_ARG, 0, 1, "SCREEN MINIMIZED", "1");
-			msdp_update_all("SCREEN_MINIMIZED", "1");
-			break;
-
-		case 2:
 			gtd->screen->minimized = 0;
 			check_all_events(NULL, SUB_ARG, 0, 1, "SCREEN MINIMIZED", "0");
 			msdp_update_all("SCREEN_MINIMIZED", "0");
+			break;
+
+		case 2:
+			gtd->screen->minimized = 1;
+			check_all_events(NULL, SUB_ARG, 0, 1, "SCREEN MINIMIZED", "1");
+			msdp_update_all("SCREEN_MINIMIZED", "1");
 			break;
 
 		case 3:
@@ -1385,6 +1385,10 @@ DO_SCREEN(screen_info)
 	tintin_printf2(ses, "gtd->screen->desk_height: %4d", gtd->screen->desk_height);
 	tintin_printf2(ses, "gtd->screen->desk_width:  %4d", gtd->screen->desk_width);
 
+	tintin_printf2(ses, "");
+
+	tintin_printf2(ses, "gtd->screen->minimized:   %4d", gtd->screen->minimized);
+
 	if (!HAS_BIT(ses->flags, SES_FLAG_READMUD) && IS_SPLIT(ses))
 	{
 		tintin_printf2(ses, "SPLIT mode detected.");
@@ -1532,6 +1536,7 @@ int get_link_screen(struct session *ses, char *result, int flags, int row, int c
 	int skip, width, len, start, opt;
 
 	ptl     = NULL;
+	start   = 0;
 	len     = 0;
 	opt     = 0;
 	*result = 0;
@@ -1544,9 +1549,10 @@ int get_link_screen(struct session *ses, char *result, int flags, int row, int c
 	}
 	else
 	{
-//		tintin_printf2(ses, "debug: scroll region only for now.");
-
-		return 0;
+		col -= 1;
+		pts = gtd->screen->grid[row - 1]->str;
+		ptw = pts;
+//		tintin_printf2(ses, "split: (%s)", pts);
 	}
 
 	while (*pts)
@@ -1753,7 +1759,7 @@ int get_link_screen(struct session *ses, char *result, int flags, int row, int c
 								strcpy(result, var);
 							}
 							pts++;
-//							tintin_printf2(gtd->ses, "link debug: %s", result);
+//							tintin_printf2(gtd->ses, "link osc: %s opt: %d", result, opt);
 							goto start;
 							break;
 
@@ -1806,15 +1812,14 @@ int get_link_screen(struct session *ses, char *result, int flags, int row, int c
 			}
 			else if (pts[1] == '[' && pts[2] == '2' && pts[3] == '4' && pts[4] == 'm')
 			{
+//				tintin_printf2(gtd->ses, "\e[1;32mfound link: (%d,%d,%d) [%s]", start,col, len, result);
+
 				if (ptl && col >= start && col < len)
 				{
 					if (*result == 0)
 					{
 						sprintf(result, "%.*s", (int) (pts - ptl), ptl);
 					}
-
-//					tintin_printf2(gtd->ses, "\e[1;32mfound link: (%d,%d) [%s]", col, len, result);
-
 					return opt ? opt : 1;
 				}
 				else

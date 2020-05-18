@@ -65,7 +65,7 @@
 
 #nop ----------
 
-#kill variable %*
+#kill variable tmp
 
 #if {&{tmp} != 0}
 {
@@ -177,8 +177,29 @@
 bla
 #unalias {bla%*}
 
+#nop ----------
+
+#class bla open
+#var bla 2
+#var bli 2
+#alias haha hihi
+#fun bla blo
+#class bla close
+#class bla save
+#class bla clear
+#if {&{bla} != 0} {error 22: #class clear malfunction}
+#class bla load
+#if {&{bla} == 0} {error 23: #class load malfunction}
+#class bla kill
+
 
 #nop ----------
+
+#if {(513 & ~1) != 512} {error 24.01: #math error}
+#if {1 << 1 != 2}       {error 24.02: #math error}
+
+#nop ----------
+
 #action {bla} #nop
 #unact bla
 #alias {bla} #nop
@@ -198,6 +219,7 @@ bla
 #line quiet #dictionary bla
 #line quiet #dictionary hello
 #draw green tile 1 -1 1 -1
+#event {GAG SESSION DISCONNECTED} {#nop}
 #format bla {}
 #fun bla {#nop}
 #unfun bla
@@ -246,7 +268,7 @@ bla
 
 #function time
 {
-	#math result ($end - start) / 1000000.000
+	#math result ($end - $start) / 1000000.000
 }
 
 #if {$error}

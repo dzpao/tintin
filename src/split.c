@@ -308,7 +308,7 @@ void split_show(struct session *ses, char *prompt, int row, int col)
 
 		show_debug(ses, LIST_PROMPT, "#PROMPT SIZE %d WITH OFFSET %d LONGER THAN ROW SIZE %d.", len, col, gtd->screen->cols);
 
-		sprintf(buf1, "#PROMPT SIZE %d LONGER THAN ROW SIZE %d.", len, gtd->screen->cols);
+		sprintf(buf1, "#PROMPT SIZE %d WITH OFFSET %d LONGER THAN ROW SIZE %d.", len, col, gtd->screen->cols);
 	}
 
 	save_pos(ses);

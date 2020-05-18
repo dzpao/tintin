@@ -244,10 +244,13 @@ int chat_new(int s)
 
 	new_buddy->fd       = fd;
 
+	new_buddy->color    = strdup("");
 	new_buddy->download = strdup("");
 	new_buddy->group    = strdup("");
 	new_buddy->ip       = strdup(inet_ntoa(sock.sin_addr));
 	new_buddy->name     = strdup("Unknown");
+	new_buddy->prefix   = strdup("");
+	new_buddy->reply    = strdup("");
 	new_buddy->version  = strdup("");
 
 	new_buddy->timeout  = gtd->time + CALL_TIMEOUT;
@@ -366,11 +369,14 @@ void *threaded_chat_call(void *arg)
 	new_buddy->fd       = sock;
 	new_buddy->port     = atoi(port);
 
+	new_buddy->color    = strdup("");
+	new_buddy->download = strdup("");
 	new_buddy->group    = strdup("");
 	new_buddy->ip       = strdup(host);
 	new_buddy->name     = strdup("");
+	new_buddy->reply    = strdup("");
+	new_buddy->prefix   = strdup("");
 	new_buddy->version  = strdup("");
-	new_buddy->download = strdup("");
 
 	strip_vt102_codes(gtd->chat->name, name);
 
@@ -656,10 +662,13 @@ void close_chat(struct chat_data *buddy, int unlink)
 
 	close(buddy->fd);
 
+	free(buddy->color);
 	free(buddy->download);
 	free(buddy->group);
 	free(buddy->ip);
 	free(buddy->name);
+	free(buddy->prefix);
+	free(buddy->reply);
 	free(buddy->version);
 
 	free(buddy);

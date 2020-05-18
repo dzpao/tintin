@@ -171,11 +171,15 @@ struct session *parse_input(struct session *ses, char *input)
 	{
 		line = (char *) malloc(BUFFER_SIZE);
 
-		strcpy(line, input);
+		sub_arg_all(ses, input, line, 1, SUB_SEC);
 
 		if (check_all_aliases(ses, line))
 		{
 			ses = script_driver(ses, LIST_ALIAS, line);
+		}
+		else if (HAS_BIT(ses->flags, SES_FLAG_SPEEDWALK) && is_speedwalk(ses, line))
+		{
+			process_speedwalk(ses, line);
 		}
 		else
 		{
@@ -202,7 +206,7 @@ struct session *parse_input(struct session *ses, char *input)
 	{
 		input = space_out(input);
 
-		input = get_arg_all(ses, input, line, GET_ONE);
+		input = get_arg_all(ses, input, line, 0);
 
 		if (parse_command(ses, line))
 		{
@@ -490,7 +494,6 @@ int cnt_arg_all(struct session *ses, char *string, int flag)
 	get all arguments - only check for unescaped command separators
 */
 
-
 char *get_arg_all(struct session *ses, char *string, char *result, int verbatim)
 {
 	char *pto, *pti;
@@ -562,6 +565,18 @@ char *get_arg_all(struct session *ses, char *string, char *result, int verbatim)
 	return pti;
 }
 
+char *sub_arg_all(struct session *ses, char *string, char *result, int verbatim, int sub)
+{
+	char *buffer = str_alloc(UMAX(strlen(string), BUFFER_SIZE));
+
+	string = get_arg_all(ses, string, buffer, verbatim);
+
+	substitute(ses, buffer, result, sub);
+
+	str_free(buffer);
+
+	return string;
+}
 
 /*
 	Braces are stripped in braced arguments leaving all else as is.
@@ -641,7 +656,7 @@ char *get_arg_in_braces(struct session *ses, char *string, char *result, int fla
 
 char *sub_arg_in_braces(struct session *ses, char *string, char *result, int flag, int sub)
 {
-	char *buffer = str_alloc(UMAX(strlen(string), BUFFER_SIZE));
+	char *buffer = str_alloc(strlen(string) + BUFFER_SIZE);
 
 	string = get_arg_in_braces(ses, string, buffer, flag);
 

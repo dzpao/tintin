@@ -298,8 +298,53 @@ int mathexp_tokenize(struct session *ses, char *str, int seed, int debug)
 						break;
 
 					case '!':
+						if (pta != buf3)
+						{
+							MATH_NODE(FALSE, EXP_PR_VAR, EXP_OPERATOR);
+						}
+						else
+						{
+							add_math_node(ntos(level), ntos(EXP_PR_VAR), "0");
+							add_math_node(ntos(level), ntos(EXP_PR_LOGCOMP), "==");
+
+							*pta++ = *pti++;
+
+							pta = buf3;
+						}
+						break;
+
 					case '~':
+						if (pta != buf3)
+						{
+							MATH_NODE(FALSE, EXP_PR_VAR, EXP_OPERATOR);
+						}
+						else
+						{
+							add_math_node(ntos(level), ntos(EXP_PR_VAR), "-1");
+							add_math_node(ntos(level), ntos(EXP_PR_INTADD), "-");
+
+							*pta++ = *pti++;
+
+							pta = buf3;
+						}
+						break;
+
 					case '+':
+						if (pta != buf3)
+						{
+							MATH_NODE(FALSE, EXP_PR_VAR, EXP_OPERATOR);
+						}
+						else
+						{
+							add_math_node(ntos(level), ntos(EXP_PR_VAR), "1");
+							add_math_node(ntos(level), ntos(EXP_PR_INTMUL), "*");
+
+							*pta++ = *pti++;
+
+							pta = buf3;
+						}
+						break;
+
 					case '-':
 						if (pta != buf3)
 						{
@@ -307,7 +352,12 @@ int mathexp_tokenize(struct session *ses, char *str, int seed, int debug)
 						}
 						else
 						{
+							add_math_node(ntos(level), ntos(EXP_PR_VAR), "-1");
+							add_math_node(ntos(level), ntos(EXP_PR_INTMUL), "*");
+
 							*pta++ = *pti++;
+
+							pta = buf3;
 						}
 						break;
 
@@ -348,8 +398,11 @@ int mathexp_tokenize(struct session *ses, char *str, int seed, int debug)
 							}
 							return FALSE;
 						}
-						*pta++ = *pti++;
-						MATH_NODE(FALSE, EXP_PR_LVL, EXP_VARIABLE);
+						else
+						{
+							*pta++ = *pti++;
+							MATH_NODE(FALSE, EXP_PR_LVL, EXP_VARIABLE);
+						}
 						level++;
 						break;
 
@@ -933,15 +986,18 @@ void mathexp_compute(struct session *ses, struct link_data *node)
 		case '-':
 			value = tintoi(node->prev->str3) - tintoi(node->next->str3);
 			break;
+
 		case '<':
 			switch (node->str3[1])
 			{
 				case '=':
 					value = tincmp(node->prev->str3, node->next->str3) <= 0;
 					break;
+
 				case '<':
-					value = atoll(node->prev->str3) << atoll(node->next->str3);
+					value = (long long) tintoi(node->prev->str3) << (long long) tintoi(node->next->str3);
 					break;
+
 				default:
 					value = tincmp(node->prev->str3, node->next->str3) < 0;
 					break;
@@ -953,9 +1009,11 @@ void mathexp_compute(struct session *ses, struct link_data *node)
 				case '=':
 					value = tincmp(node->prev->str3, node->next->str3) >= 0;
 					break;
+
 				case '>':
-					value = atoll(node->prev->str3) >> atoll(node->next->str3);
+					value = (long long) tintoi(node->prev->str3) >> (long long) tintoi(node->next->str3);
 					break;
+
 				default:
 					value = tincmp(node->prev->str3, node->next->str3) > 0;
 					break;
@@ -968,8 +1026,9 @@ void mathexp_compute(struct session *ses, struct link_data *node)
 				case '&':
 					value = tintoi(node->prev->str3) && tintoi(node->next->str3);
 					break;
+
 				default:
-					value = atoll(node->prev->str3) & atoll(node->next->str3);
+					value = (long long) tintoi(node->prev->str3) & (long long) tintoi(node->next->str3);
 					break;
 			}
 			break;
@@ -981,7 +1040,7 @@ void mathexp_compute(struct session *ses, struct link_data *node)
 					break;
 
 				default:
-					value = atoll(node->prev->str3) ^ atoll(node->next->str3);
+					value = (long long) tintoi(node->prev->str3) ^ (long long) tintoi(node->next->str3);
 					break;
 			}
 			break;
@@ -993,7 +1052,7 @@ void mathexp_compute(struct session *ses, struct link_data *node)
 					break;
 
 				default:
-					value = atoll(node->prev->str3) | atoll(node->next->str3);
+					value = (long long) tintoi(node->prev->str3) | (long long) tintoi(node->next->str3);
 					break;
 			}
 			break;

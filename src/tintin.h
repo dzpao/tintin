@@ -965,7 +965,7 @@ enum operators
 
 #define IS_SPLIT(ses)             (gtd->screen->rows != (ses)->split->bot_row)
 #define SCROLL(ses)               ((ses)->cur_row == 0 || ((ses)->cur_row >= (ses)->split->top_row && (ses)->cur_row <= (ses)->split->bot_row) || (ses)->cur_row == gtd->screen->rows)
-#define VERBATIM(ses)             (gtd->level->verbatim || (gtd->level->input == 0 && HAS_BIT((ses)->flags, SES_FLAG_VERBATIM)))
+#define VERBATIM(ses)             (gtd->level->verbatim || (gtd->level->input == 0 && HAS_BIT((ses)->flags, SES_FLAG_VERBATIM)) || HAS_BIT(gtd->flags, TINTIN_FLAG_CHILDLOCK))
 
 #define DO_ARRAY(array) struct session *array (struct session *ses, struct listnode *list, char *arg, char *var)
 #define DO_BUFFER(buffer) void buffer (struct session *ses, char *arg)
@@ -977,6 +977,7 @@ enum operators
 #define DO_DAEMON(daemon) void daemon (struct session *ses, char *arg)
 #define DO_HISTORY(history) void history (struct session *ses, char *arg1, char *arg2, char *arg3)
 #define DO_LINE(line) struct session *line (struct session *ses, char *arg)
+#define DO_LOG(log) void log (struct session *ses, char *arg, char *arg1, char *arg2)
 #define DO_MAP(map) void map (struct session *ses, char *arg, char *arg1, char *arg2)
 #define DO_PATH(path) void path (struct session *ses, char *arg)
 #define DO_PORT(port) struct session *port (struct session *ses, char *arg1, char *arg2, char *arg)
@@ -1128,6 +1129,7 @@ struct session
 	time_t                  logline_time;
 	char                  * line_capturefile;
 	int                     line_captureindex;
+	int                     gagline;
 	struct listroot       * list[LIST_MAX];
 	int                     created;
 	int                     cur_row;
@@ -1547,6 +1549,7 @@ typedef void            PATH    (struct session *ses, char *arg);
 typedef struct session *PORT    (struct session *ses, char *arg1, char *arg2, char *arg);
 typedef struct session *LINE    (struct session *ses, char *arg);
 typedef void            HISTORY (struct session *ses, char *arg1, char *arg2, char *arg3);
+typedef void            LOG     (struct session *ses, char *arg, char *arg1, char *arg2);
 typedef void            BUFFER  (struct session *ses, char *arg);
 typedef void            MSDP    (struct session *ses, struct port_data *buddy, int index);
 typedef void            SCREEN  (struct session *ses, int ind, char *arg, char *arg1, char *arg2);
@@ -1665,6 +1668,12 @@ struct line_type
 	char                  * desc;
 };
 
+struct log_type
+{
+	char                  * name;
+	LOG                   * fun;
+	char                  * desc;
+};
 
 struct map_type
 {
@@ -2006,6 +2015,7 @@ extern void  modified_input(void);
 
 extern DO_COMMAND(do_map);
 
+extern void delete_room_data(struct room_data *room);
 extern  int follow_map(struct session *ses, char *argument);
 extern void show_vtmap(struct session *ses);
 extern void map_mouse_handler(struct session *ses, char *left, char *right, int row, int col, int rev_row, int rev_col, int height, int width);
@@ -2327,6 +2337,11 @@ extern DO_LINE(line_verbose);
 
 extern DO_COMMAND(do_log);
 
+DO_LOG(log_append);
+DO_LOG(log_overwrite);
+DO_LOG(log_off);
+DO_LOG(log_remove);
+
 extern void loginit(struct session *ses, FILE *file, int newline);
 extern void logit(struct session *ses, char *txt, FILE *file, int newline);
 extern void write_html_header(struct session *ses, FILE *fp);
@@ -2499,6 +2514,7 @@ extern void process_speedwalk(struct session *ses, char *input);
 extern struct session *parse_tintin_command(struct session *ses, char *input);
 extern int cnt_arg_all(struct session *ses, char *string, int flag);
 extern char *get_arg_all(struct session *ses, char *string, char *result, int verbatim);
+extern char *sub_arg_all(struct session *ses, char *string, char *result, int verbatim, int sub);
 extern char *get_arg_in_braces(struct session *ses, char *string, char *result, int flag);
 extern char *sub_arg_in_braces(struct session *ses, char *string, char *result, int flag, int sub);
 extern char *get_arg_with_spaces(struct session *ses, char *string, char *result, int flag);
@@ -2774,6 +2790,7 @@ extern struct event_type event_table[];
 extern struct history_type history_table[];
 extern struct line_type line_table[];
 extern struct list_type list_table[LIST_MAX];
+extern struct log_type log_table[];
 extern struct map_type map_table[];
 extern struct path_type path_table[];
 extern struct port_type port_table[];
@@ -3037,7 +3054,7 @@ extern int find_secure_color_code(char *str);
 extern int skip_one_char(struct session *ses, char *str, int *width);
 extern int skip_vt102_codes(char *str);
 extern int skip_vt102_codes_non_graph(char *str);
-extern void strip_vt102_codes(char *str, char *buf);
+extern int strip_vt102_codes(char *str, char *buf);
 extern void strip_vt102_codes_non_graph(char *str, char *buf);
 extern void strip_non_vt102_codes(char *str, char *buf);
 extern void get_color_codes(char *old, char *str, char *buf, int flags);

@@ -319,6 +319,7 @@ void mouse_handler(struct session *ses, int flags, int row, int col)
 		case 1:
 			check_all_events(ses, SUB_ARG, 2, 6, "%s LINK %s", arg1, arg2, ntos(row), ntos(col), ntos(rev_row), ntos(-1 - (gtd->screen->cols - col)), word, line);
 			break;
+
 		case 2:
 			if (flags == 0)
 			{

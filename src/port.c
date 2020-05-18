@@ -420,12 +420,13 @@ void port_socket_printf(struct session *ses, struct port_data *buddy, char *form
 {
 	char buf[BUFFER_SIZE];
 	va_list args;
+	int len;
 
 	va_start(args, format);
-	vsnprintf(buf, BUFFER_SIZE / 3, format, args);
+	len = vsnprintf(buf, BUFFER_SIZE / 3, format, args);
 	va_end(args);
 
-	port_socket_write(ses, buddy, buf, strlen(buf));
+	port_socket_write(ses, buddy, buf, len);
 }
 
 void port_telnet_printf(struct session *ses, struct port_data *buddy, size_t length, char *format, ...)

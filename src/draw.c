@@ -234,7 +234,7 @@ DO_COMMAND(do_draw)
 				{
 					if (ses != gtd->ses)
 					{
-						show_error(ses, LIST_COMMAND, "#ERROR: #DRAW %s %d %d %d %d: SESSION IS IN THE BACKGROUND.", draw_table[index].name, top_row, top_col, bot_row, bot_col);
+						show_message(ses, LIST_COMMAND, "#WARNING: #DRAW %s %d %d %d %d: SESSION IS IN THE BACKGROUND.", draw_table[index].name, top_row, top_col, bot_row, bot_col);
 
 						return ses;
 					}

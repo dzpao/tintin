@@ -498,12 +498,14 @@ void readmud(struct session *ses)
 void process_mud_output(struct session *ses, char *linebuf, int prompt)
 {
 	char line[STRING_SIZE];
+	int str_len, raw_len;
 
 	push_call("process_mud_output(%p,%p,%d)",ses,linebuf,prompt);
 
 	ses->check_output = 0;
 
-	strip_vt102_codes(linebuf, line);
+	raw_len = strlen(linebuf);
+	str_len = strip_vt102_codes(linebuf, line);
 
 	check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "RECEIVED LINE", linebuf, line);
 
@@ -513,11 +515,11 @@ void process_mud_output(struct session *ses, char *linebuf, int prompt)
 		return;
 	}
 
-	if (prompt)
+	if (str_len && prompt)
 	{
-		check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "RECEIVED PROMPT", linebuf, line);
+		check_all_events(ses, SUB_ARG|SUB_SEC, 0, 4, "RECEIVED PROMPT", linebuf, line, ntos(raw_len), ntos(str_len));
 
-		if (check_all_events(ses, SUB_ARG|SUB_SEC, 0, 2, "CATCH RECEIVED PROMPT", linebuf, line))
+		if (check_all_events(ses, SUB_ARG|SUB_SEC, 0, 4, "CATCH RECEIVED PROMPT", linebuf, line, ntos(raw_len), ntos(str_len)))
 		{
 			pop_call();
 			return;
@@ -539,9 +541,9 @@ void process_mud_output(struct session *ses, char *linebuf, int prompt)
 		Take care of gags, vt102 support still goes
 	*/
 
-	if (HAS_BIT(ses->flags, SES_FLAG_GAG))
+	if (ses->gagline > 0)
 	{
-		DEL_BIT(ses->flags, SES_FLAG_GAG);
+		ses->gagline--;
 
 		strip_non_vt102_codes(linebuf, line);
 
@@ -549,7 +551,7 @@ void process_mud_output(struct session *ses, char *linebuf, int prompt)
 
 		strip_vt102_codes(linebuf, line);
 
-		show_debug(ses, LIST_GAG, "#DEBUG GAG {%s}", line);
+		show_debug(ses, LIST_GAG, "#DEBUG GAG {%d} {%s}", ses->gagline + 1, line);
 
 		pop_call();
 		return;

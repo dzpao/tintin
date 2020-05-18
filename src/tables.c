@@ -1565,6 +1565,14 @@ struct line_type line_table[] =
 	{    "",                  NULL,                ""                                               }
 };
 
+struct log_type log_table[] =
+{
+	{    "APPEND",            log_append,          "Start logging, apending to give file."          },
+	{    "OFF",               log_off,             "Stop logging."                                  },
+	{    "OVERWRITE",         log_overwrite,       "Start logging, overwriting the given file."     },
+	{    "",                  NULL,                ""                                               }
+};
+
 struct history_type history_table[] =
 {
 //	{    "CHARACTER",         history_character,   "Set the character used for repeating commands." },

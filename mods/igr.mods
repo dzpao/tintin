@@ -1,6 +1,10 @@
 Mar 2020        2.02.03
 ------------------------------------------------------------------------------
 
+data.c          Added SESSION_ACTIVE field to #info session save
+
+mapper.c        Added MAP CREATE EXIT and MAP DELETE EXIT events.
+
 history.c       Added #history get <variable> <start> <end> option.
 
 draw.c          Added #draw map <square> option.
@@ -36,15 +40,15 @@ path.c          Updated #path unzip to take the new speedwalk format.
 
 telopt_client.c Added IAC SB NAWS event, can be caught.
 
-split.c         Added SCREEN SPLIT FILL event, which allows catching the
+split.c         Added SCREEN SPLIT FILL event, which triggers on the
                 split line drawing routine, can be caught.
 
 memory.c        Added a custom memory stack, still a work in progress.
 
 utf8.c          Added #config charset CP1251TOUTF8
 
-cursor.c        Added #cursor {preserve macro} which called from within a
-                macro will preserve the macro state. Example:
+cursor.c        Added #cursor {preserve macro} which when called from within
+                a macro will preserve the macro state. Example:
 
                 #macro {\cg} {#showme e: end\nh: home;#cursor preserve macro}
                 #macro {\cge} {#showme end}

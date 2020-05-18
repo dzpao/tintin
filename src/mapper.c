@@ -130,10 +130,6 @@ DO_COMMAND(do_map)
 						SET_BIT(ses->flags, SES_FLAG_UPDATEVTMAP);
 					}
 				}
-				pop_call();
-
-				push_call("MAP_%s(%p,%p,%p,%p,%p)",map_table[cnt].name,ses,arg,arg1,arg2);
-
 				map_table[cnt].fun (ses, arg, arg1, arg2);
 
 				pop_call();
@@ -268,10 +264,17 @@ int delete_map(struct session *ses)
 		del_undo(ses, ses->map->undo_head);
 	}
 
+//	delete_exit(ses, 0, ses->map->global_exit);
+
 	free(ses->map->global_exit->name);
 	free(ses->map->global_exit->cmd);
 	free(ses->map->global_exit->data);
+	free(ses->map->global_exit->color);
+
+	free(ses->map->grid_rooms);
+	free(ses->map->grid_vnums);
 	free(ses->map->global_exit);
+	free(ses->map->search);
 
 	free(ses->map);
 
@@ -358,6 +361,21 @@ struct room_data *create_room(struct session *ses, char *format, ...)
 	return newroom;
 }
 
+void delete_room_data(struct room_data *room)
+{
+	free(room->area);
+	free(room->color);
+	free(room->id);
+	free(room->name);
+	free(room->symbol);
+	free(room->desc);
+	free(room->note);
+	free(room->terrain);
+	free(room->data); 
+
+	return;
+}
+	
 void delete_room(struct session *ses, int room, int exits)
 {
 	struct exit_data *exit, *exit_next;
@@ -370,15 +388,7 @@ void delete_room(struct session *ses, int room, int exits)
 		delete_exit(ses, room, ses->map->room_list[room]->f_exit);
 	}
 
-	free(ses->map->room_list[room]->area);
-	free(ses->map->room_list[room]->color);
-	free(ses->map->room_list[room]->id);
-	free(ses->map->room_list[room]->name);
-	free(ses->map->room_list[room]->symbol);
-	free(ses->map->room_list[room]->desc);
-	free(ses->map->room_list[room]->note);
-	free(ses->map->room_list[room]->terrain);
-	free(ses->map->room_list[room]->data); 
+	delete_room_data(ses->map->room_list[room]);
 
 	free(ses->map->room_list[room]);
 
@@ -430,6 +440,7 @@ struct exit_data *create_exit(struct session *ses, int vnum, char *format, ...)
 	{
 		free(newexit);
 
+		pop_call();
 		return find_exit(ses, vnum, buf);
 	}
 	newexit->name = strdup(buf);
@@ -466,12 +477,16 @@ struct exit_data *create_exit(struct session *ses, int vnum, char *format, ...)
 
 	show_message(ses, LIST_COMMAND, "#MAP CREATE EXIT {%s} {%s} TO ROOM %d.", newexit->name, newexit->cmd, newexit->vnum);
 
+	check_all_events(ses, SUB_ARG|SUB_SEC, 0, 4, "MAP CREATE EXIT", ntos(room->vnum), newexit->name,newexit->cmd, ntos(newexit->vnum));
+
 	pop_call();
 	return newexit;
 }
 
 void delete_exit(struct session *ses, int room, struct exit_data *exit)
 {
+	check_all_events(ses, SUB_ARG|SUB_SEC, 0, 4, "MAP DELETE EXIT", ntos(room), exit->name, exit->cmd, ntos(exit->vnum));
+
 	free(exit->name);
 	free(exit->cmd);
 	free(exit->data);
@@ -553,11 +568,8 @@ char *get_exit_color(struct session *ses, int room, struct exit_data *exit)
 		pop_call();
 		return ses->map->color[MAP_COLOR_EXIT];
 	}
-	else
-	{
-		pop_call();
-		return "";
-	}
+	pop_call();
+	return "";
 }
 
 int revdir_to_grid(int dir)
@@ -5214,7 +5226,7 @@ DO_MAP(map_delete)
 			return;
 		}
 	}
-	else
+	else if (ses->map->in_room)
 	{
 		exit = find_exit(ses, ses->map->in_room, arg1);
 
@@ -5225,17 +5237,23 @@ DO_MAP(map_delete)
 
 		if (exit == NULL)
 		{
-			show_error(ses, LIST_COMMAND, "#MAP: No exit with that name found");
+			show_error(ses, LIST_COMMAND, "#MAP DELETE: No exit with that name found");
 			
 			return;
 		}
 
 		room = exit->vnum;
 	}
+	else
+	{
+		show_error(ses, LIST_COMMAND, "#MAP DELETE: You must first enter the map");
+
+		return;
+	}
 
 	if (room == ses->map->in_room || room == ses->map->at_room)
 	{
-		show_error(ses, LIST_COMMAND, "#MAP: You must first leave the room you're trying to delete");
+		show_error(ses, LIST_COMMAND, "#MAP DELETE: You must first leave the room you're trying to delete");
 		
 		return;
 	}
@@ -6930,7 +6948,7 @@ DO_MAP(map_map)
 		{
 			for (line = 1 ; line <= 3 ; line++)
 			{
-				gtd->buf = str_cpy(&gtd->buf, ses->map->color[MAP_COLOR_BACK]);
+				gtd->buf = str_cpy_printf(&gtd->buf, "\e[m%s", ses->map->color[MAP_COLOR_BACK]);
 
 				for (x = 1 ; x < map_grid_x - 1 ; x++)
 				{
@@ -6974,7 +6992,7 @@ DO_MAP(map_map)
 		{
 			for (line = 1 ; line <= 2 ; line++)
 			{
-				str_cpy(&gtd->buf, ses->map->color[MAP_COLOR_BACK]);
+				str_cpy_printf(&gtd->buf, "\e[m%s", ses->map->color[MAP_COLOR_BACK]);
 
 				for (x = 1 ; x < map_grid_x - 1 ; x++)
 				{
@@ -7027,7 +7045,7 @@ DO_MAP(map_map)
 		{
 			for (line = 1 ; line <= 2 ; line++)
 			{
-				str_cpy(&gtd->buf, ses->map->color[MAP_COLOR_BACK]);
+				str_cpy_printf(&gtd->buf, "\e[m%s", ses->map->color[MAP_COLOR_BACK]);
 
 				for (x = 1 ; x < map_grid_x - 1 ; x++)
 				{
@@ -7069,7 +7087,7 @@ DO_MAP(map_map)
 	{
 		for (y = map_grid_y - 2 ; y >= 1 ; y--)
 		{
-			str_cpy(&gtd->buf, ses->map->color[MAP_COLOR_BACK]);
+			str_cpy_printf(&gtd->buf, "\e[m%s", ses->map->color[MAP_COLOR_BACK]);
 
 			for (x = 1 ; x < map_grid_x - 1 ; x++)
 			{

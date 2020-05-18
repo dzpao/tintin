@@ -252,10 +252,9 @@ DO_CLASS(class_load)
 		return ses;
 	}
 
-	file = fmemopen(node->data, (size_t) node->val32[1], "r");
+	file = fmemopen(node->data, (size_t) atoi(node->arg4), "r");
 
 	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN LOADED FROM MEMORY.", arg1);
-//	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN LOADED FROM MEMORY (%d BYTES) (%s).", arg1, node->val32[1], node->data);
 
 	read_file(ses, file, arg1);
 
@@ -307,11 +306,10 @@ DO_CLASS(class_read)
 DO_CLASS(class_save)
 {
 	FILE *file;
+	size_t len;
 	int list, index;
 
-	str_cpy(&node->arg4, "");
-
-	file = open_memstream(&node->data, (size_t *) &node->val32[1]);
+	file = open_memstream(&node->data, (size_t *) &len);
 
 	fprintf(file, "%cCLASS {%s} OPEN\n\n", gtd->tintin_char, arg1);
 
@@ -335,8 +333,9 @@ DO_CLASS(class_save)
 
 	fclose(file);
 
+	str_cpy_printf(&node->arg4, "%d", len);
+
 	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN SAVED TO MEMORY.", arg1);
-//	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN SAVED TO MEMORY (%d BYTES) (%s).", arg1, node->val32[1], node->data);
 
 	return ses;
 }	

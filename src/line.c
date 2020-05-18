@@ -202,9 +202,25 @@ DO_LINE(line_gag)
 
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 
-	show_debug(ses, LIST_GAG, "#DEBUG LINE GAG");
+	switch (*arg1)
+	{
+		case '-':
+			ses->gagline -= get_number(ses, arg1+1);
+			break;
+		case '+':
+			ses->gagline += get_number(ses, arg1+1);
+			break;
+		case 0:
+			ses->gagline = 1;
+			break;
+		default:
+			ses->gagline = get_number(ses, arg1);
+			break;
+	}
 
-	SET_BIT(ses->flags, SES_FLAG_GAG);
+	show_debug(ses, LIST_GAG, "#DEBUG LINE GAG {%s}", arg1);
+
+//	SET_BIT(ses->flags, SES_FLAG_GAG);
 
 	return ses;
 }

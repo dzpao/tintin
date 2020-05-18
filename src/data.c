@@ -333,6 +333,7 @@ void delete_index_list(struct listroot *root, int index)
 	switch (root->type)
 	{
 		case LIST_TERRAIN:
+			delete_room_data(node->room);
 			free(node->room);
 			break;
 
@@ -1175,6 +1176,7 @@ DO_COMMAND(do_info)
 					sprintf(name, "info[SESSION]");
 
 					set_nest_node_ses(ses, name, "{SESSION_NAME}{%s}", ses->name);
+					add_nest_node_ses(ses, name, "{SESSION_ACTIVE}{%d}", gtd->ses == ses);
 					add_nest_node_ses(ses, name, "{SESSION_CLASS}{%s}", ses->group);
 					add_nest_node_ses(ses, name, "{SESSION_CREATED}{%d}", ses->created);
 					add_nest_node_ses(ses, name, "{SESSION_HOST} {%s}", ses->session_host);
@@ -1186,6 +1188,7 @@ DO_COMMAND(do_info)
 				else
 				{
 					tintin_printf2(ses, "{SESSION_NAME}{%s}", ses->name);
+					tintin_printf2(ses, "{SESSION_ACTIVE}{%d}", gtd->ses == ses);
 					tintin_printf2(ses, "{SESSION_CLASS}{%s}", ses->group);
 					tintin_printf2(ses, "{SESSION_CREATED}{%d}", ses->created);
 					tintin_printf2(ses, "{SESSION_HOST} {%s}", ses->session_host);

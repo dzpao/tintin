@@ -118,11 +118,6 @@ int raw_len_str(struct session *ses, char *str, int start, int end)
 
 	while (raw_cnt < raw_len)
 	{
-		if (end >= 0 && str_cnt >= end)
-		{
-			break;
-		}
-
 		tmp_cnt = skip_vt102_codes(&str[raw_cnt]);
 
 		if (tmp_cnt)
@@ -133,6 +128,7 @@ int raw_len_str(struct session *ses, char *str, int start, int end)
 			{
 				ret_cnt += tmp_cnt;
 			}
+			width = 0;
 		}
 		else if (HAS_BIT(ses->charset, CHARSET_FLAG_UTF8) && is_utf8_head(&str[raw_cnt]))
 		{    
@@ -143,7 +139,6 @@ int raw_len_str(struct session *ses, char *str, int start, int end)
 				ret_cnt += tmp_cnt;
 			}
 			raw_cnt += tmp_cnt;
-			str_cnt += width;
 		}
 		else
 		{
@@ -152,8 +147,13 @@ int raw_len_str(struct session *ses, char *str, int start, int end)
 				ret_cnt++;
 			}
 			raw_cnt++;
-			str_cnt++;
+			width = 1;
 		}
+		if (end >= 0 && str_cnt + width > end)
+		{
+			break;
+		}
+		str_cnt += width;
 	}
 	return ret_cnt;
 }

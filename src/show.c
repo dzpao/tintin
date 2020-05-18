@@ -50,11 +50,11 @@ DO_COMMAND(do_showme)
 
 	do_one_line(arg1, ses);
 
-	if (HAS_BIT(ses->flags, SES_FLAG_GAG))
+	if (ses->gagline > 0)
 	{
-		DEL_BIT(ses->flags, SES_FLAG_GAG);
+		ses->gagline--;
 
-		show_debug(ses, LIST_GAG, "#DEBUG GAG {%s}", arg1);
+		show_debug(ses, LIST_GAG, "#DEBUG GAG {%d} {%s}", ses->gagline + 1, arg1);
 
 		pop_call();
 		return ses;
@@ -437,13 +437,13 @@ void tintin_puts(struct session *ses, char *string)
 
 	do_one_line(string, ses);
 
-	if (HAS_BIT(ses->flags, SES_FLAG_GAG))
+	if (ses->gagline)
 	{
-		DEL_BIT(ses->flags, SES_FLAG_GAG);
+		ses->gagline--;
 
 		gtd->level->ignore++;
 
-		show_debug(ses, LIST_GAG, "#DEBUG GAG {%s}", string);
+		show_debug(ses, LIST_GAG, "#DEBUG GAG {%d} {%s}", ses->gagline + 1, string);
 
 		gtd->level->ignore--;
 	}

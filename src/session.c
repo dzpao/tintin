@@ -760,6 +760,9 @@ void dispose_session(struct session *ses)
 	free(ses->lognext_name);
 	free(ses->logline_name);
 	free(ses->split);
+	str_free(ses->input->buf);
+	str_free(ses->input->tmp);
+	free(ses->input);
 
 	free(ses);
 

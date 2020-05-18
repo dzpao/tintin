@@ -515,7 +515,7 @@ void check_all_gags(struct session *ses, char *original, char *line)
 			{
 				delete_node_list(ses, LIST_GAG, node);
 			}
-			SET_BIT(ses->flags, SES_FLAG_GAG);
+			ses->gagline++;
 
 			return;
 		}
@@ -766,15 +766,14 @@ int check_all_prompts(struct session *ses, char *original, char *line, int check
 			}
 
 			show_debug(ses, LIST_PROMPT, "#DEBUG PROMPT {%s}", node->arg1);
-//			show_debug(ses, LIST_GAG, "#DEBUG GAG {%s}", node->arg1);
 
 			split_show(ses, original, atoi(node->arg3), atoi(node->arg4));
 
 			if (node->shots && --node->shots == 0)
 			{
-				delete_node_list(ses, LIST_GAG, node);
+				delete_node_list(ses, LIST_PROMPT, node);
 			}
-			SET_BIT(ses->flags, SES_FLAG_GAG);
+			ses->gagline = 1;
 		}
 	}
 	return 0;

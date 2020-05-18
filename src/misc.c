@@ -119,7 +119,7 @@ DO_COMMAND(do_commands)
 			continue;
 		}
 
-		if ((int) strlen(buf) + 20 > gtd->screen->cols)
+		if (strip_vt102_strlen(ses, buf) + 20 > gtd->screen->cols)
 		{
 			tintin_puts2(ses, buf);
 			buf[0] = 0;
@@ -137,8 +137,6 @@ DO_COMMAND(do_commands)
 	{
 		tintin_puts2(ses, buf);
 	}
-	tintin_header(ses, "");
-
 	return ses;
 }
 

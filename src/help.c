@@ -104,19 +104,18 @@ DO_COMMAND(do_help)
 		{
 			switch (help_table[cnt].type)
 			{
+				case TOKEN_TYPE_STATEMENT:
+//					strcpy(color, COLOR_STATEMENT);
+//					break;
+				case TOKEN_TYPE_CONFIG:
+//					strcpy(color, COLOR_CONFIG);
+//					break;
 				case TOKEN_TYPE_COMMAND:
 					strcpy(color, COLOR_COMMAND);
 					break;
 
-				case TOKEN_TYPE_STATEMENT:
-					strcpy(color, COLOR_STATEMENT);
-					break;
-
 				case TOKEN_TYPE_STRING:
 					strcpy(color, COLOR_STRING);
-					break;
-				case TOKEN_TYPE_CONFIG:
-					strcpy(color, COLOR_CONFIG);
 					break;
 
 				default:
@@ -1140,6 +1139,10 @@ struct help_type help_table[] =
 		"         IAC SB <VAR>           %0 raw text %1 raw data\n"
 		"         KEYPRESS               %0 character %1 unicode index\n"
 		"         LONG-CLICKED <VAR>     %0 row %1 col %2 -row %3 -col %4 word %5 line\n"
+		"         MAP CREATE EXIT        %0 vnum %1 exit name %2 exit cmd %3 exit vnum\n"
+		"         MAP CREATE ROOM        %0 vnum %1 name\n"
+		"         MAP DELETE EXIT        %0 vnum %1 exit name %2 exit cmd %3 exit vnum\n"
+		"         MAP DELETE ROOM        %0 vnum %1 name\n"
 		"         MAP ENTER MAP          %0 new vnum\n"
 		"         MAP ENTER ROOM         %0 new vnum %1 old vnum\n"
 		"         MAP ENTER ROOM <VAR>   %0 new vnum %1 old vnum\n"
@@ -2358,6 +2361,7 @@ struct help_type help_table[] =
 		"         <278>  Set the exit data. Useful with a closed door where you can\n"
 		"         <278>  set the exit command: '#map exit e command {open east;e}'.\n"
 		"         <278>  Use #map exit <exit> for a list of available options.\n"
+		"         <278>  Use #map exit <eixt> save to save the exit data.\n"
 		"\n"
 		"         <178>#map exitflag <exit> <AVOID|BLOCK|HIDE|INVIS> [on|off]\n"
 		"         <278>  Set exit flags. See #map roomflag for more info.\n"

@@ -154,7 +154,7 @@ void process_input(void)
 
 	if (HAS_BIT(gtd->flags, TINTIN_FLAG_CHILDLOCK))
 	{
-		write_mud(gtd->ses, gtd->ses->input->buf, SUB_EOL);
+		parse_input(gtd->ses, gtd->ses->input->buf);
 	}
 	else
 	{
@@ -808,7 +808,7 @@ void echo_command(struct session *ses, char *line)
 		sprintf(buffer, "\e[0m");
 	}
 
-	if (ses->wrap == gtd->screen->cols)
+//	if (ses->wrap == gtd->screen->cols)
 	{
 		gtd->level->scroll++;
 

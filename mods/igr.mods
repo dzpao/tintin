@@ -1,3 +1,25 @@
+May 2020        2.02.04
+------------------------------------------------------------------------------
+
+show.c          Added RECEIVED ERROR event. Example:
+                #event {RECEIVED ERROR} {#info stack}
+
+mapper.c        Can use functions and variables in roomsymbols, must use @@
+                when using #map set roomsymbol.
+
+class.c         Added #class {name} assign {argument} which will execute the
+                argument, assigning all newly created triggers to the given
+                class.
+
+draw.c          Added #draw buffer, which draws the scrollback buffer based
+                on the scrolling state.
+
+draw.c          Added #draw foreground flag, which allows inactive sessions
+                to draw.
+
+update.c        Added END OF RUN event which triggers at the end of #map or
+                #path run.
+
 Mar 2020        2.02.03
 ------------------------------------------------------------------------------
 
@@ -26,7 +48,7 @@ line.c          Added #line multishot {number} {argument} which should make
 line.c          Added #line local {argument} which should make all indirectly
                 created variables local.
 
-variable.c      Updated %h to allow #echo %+40h {some text} 
+variable.c      Updated %h to allow #echo %+40h {some text}
 
 update.c        Added the DISPLAY UPDATE event which is triggered right
                 before the final display update when new data has become
@@ -53,6 +75,9 @@ cursor.c        Added #cursor {preserve macro} which when called from within
                 #macro {\cg} {#showme e: end\nh: home;#cursor preserve macro}
                 #macro {\cge} {#showme end}
                 #macro {\cgh} {#showme home}
+
+cursor.c        Added #cursor {reset macro} which when called from within
+                a macro will reset the macro state.
 
 path.c          Added #path get {LENGTH|POSITION} <variable>
 

@@ -259,12 +259,36 @@ DO_SCREEN(screen_fill)
 		{
 			if (ses->split->sav_top_col)
 			{
-				execute(ses, "#DRAW %s TEED VERTICAL LINE %d %d %d %d", arg2, ses->split->top_row - 1, ses->split->top_col - 1, ses->split->bot_row + 1, ses->split->top_col - 1);
+				execute(ses, "#DRAW %s VERTICAL TEED LINE %d %d %d %d", arg2, ses->split->top_row - 1, ses->split->top_col - 1, ses->split->bot_row + 1, ses->split->top_col - 1);
+
+				if (ses->split->sav_top_col == 1)
+				{
+					if (ses->split->sav_top_row > 1)
+					{
+						execute(ses, "#DRAW %s HORIZONTAL TEED TOP LEFT CORNER %d %d %d %d", arg2, ses->split->top_row - 1, ses->split->top_col - 1, ses->split->bot_row + 1, ses->split->bot_col + 1);
+					}
+					if (ses->split->sav_bot_row > 1)
+					{
+						execute(ses, "#DRAW %s HORIZONTAL TEED BOTTOM LEFT CORNER %d %d %d %d", arg2, ses->split->bot_row + 1, ses->split->top_col - 1, ses->split->bot_row + 1, ses->split->top_col - 1);
+					}
+				}
 			}
 
 			if (ses->split->sav_bot_col)
 			{
-				execute(ses, "#DRAW %s TEED VERTICAL LINE %d %d %d %d", arg2, ses->split->top_row - 1, ses->split->bot_col + 1, ses->split->bot_row + 1, ses->split->bot_col + 1);
+				execute(ses, "#DRAW %s VERTICAL TEED LINE %d %d %d %d", arg2, ses->split->top_row - 1, ses->split->bot_col + 1, ses->split->bot_row + 1, ses->split->bot_col + 1);
+
+				if (ses->split->sav_bot_col == 1)
+				{
+					if (ses->split->sav_top_row > 1)
+					{
+						execute(ses, "#DRAW %s HORIZONTAL TEED TOP RIGHT CORNER %d %d %d %d", arg2, ses->split->top_row - 1, ses->split->bot_col + 1, ses->split->bot_row + 1, ses->split->bot_col + 1);						
+					}
+					if (ses->split->sav_bot_row > 1)
+					{
+						execute(ses, "#DRAW %s HORIZONTAL TEED BOTTOM RIGHT CORNER %d %d %d %d", arg2, ses->split->bot_row + 1, ses->split->bot_col + 1, ses->split->bot_row + 1, ses->split->bot_col + 1);
+					}
+				}
 			}
 		}
 		else
@@ -716,11 +740,15 @@ DO_SCREEN(screen_load)
 
 DO_SCREEN(screen_refresh)
 {
-	SET_BIT(ses->flags, SES_FLAG_PRINTBUFFER);
+	if (HAS_BIT(ses->flags, SES_FLAG_SPLIT) && ses->wrap != gtd->screen->cols)
+	{
+		SET_BIT(ses->flags, SES_FLAG_PRINTLINE);
+	}
+/*	SET_BIT(ses->flags, SES_FLAG_PRINTBUFFER);
 
 	buffer_end(ses, "");
 
-	DEL_BIT(ses->flags, SES_FLAG_PRINTBUFFER);
+	DEL_BIT(ses->flags, SES_FLAG_PRINTBUFFER);*/
 }
 
 DO_SCREEN(screen_resize)

@@ -147,7 +147,7 @@ struct list_type list_table[LIST_MAX] =
 	{    "HISTORY",           "HISTORIES",          SORT_APPEND,      1, 0, 0, LIST_FLAG_MESSAGE|LIST_FLAG_HIDE },
 	{    "LANDMARK",          "LANDMARKS",          SORT_ALPHA,       4, 0, 0, LIST_FLAG_MESSAGE|LIST_FLAG_HIDE },
 	{    "MACRO",             "MACROS",             SORT_ALPHA,       2, 2, 0, LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT },
-	{    "PATH",              "PATHS",              SORT_APPEND,      2, 0, 0, LIST_FLAG_MESSAGE|LIST_FLAG_HIDE },
+	{    "PATH",              "PATHS",              SORT_APPEND,      2, 0, 0, LIST_FLAG_MESSAGE },
 	{    "PATHDIR",           "PATHDIRS",           SORT_ALPHA,       3, 0, 0, LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT },
 	{    "PROMPT",            "PROMPTS",            SORT_ALPHA,       4, 0, 0, LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT|LIST_FLAG_REGEX },
 	{    "SUBSTITUTE",        "SUBSTITUTES",        SORT_PRIORITY,    3, 0, 3, LIST_FLAG_MESSAGE|LIST_FLAG_READ|LIST_FLAG_WRITE|LIST_FLAG_CLASS|LIST_FLAG_INHERIT|LIST_FLAG_REGEX|LIST_FLAG_PRIORITY },
@@ -550,12 +550,13 @@ struct color_type map_color_table[] =
 
 struct class_type class_table[] =
 {
-	{    "OPEN",              class_open             },
+	{    "ASSIGN",            class_assign           },
 	{    "CLEAR",             class_clear            },
 	{    "CLOSE",             class_close            },
 	{    "KILL",              class_kill             },
 	{    "LIST",              class_list             },
 	{    "LOAD",              class_load             },
+	{    "OPEN",              class_open             },
 	{    "READ",              class_read             },
 	{    "SAVE",              class_save             },
 	{    "SIZE",              class_size             },
@@ -1132,6 +1133,13 @@ struct draw_type draw_table[] =
 	},
 
 	{
+		"BUFFER",
+		"Draw the scrollback buffer.",
+		0,
+		draw_buffer
+	},
+
+	{
 		"CORNER",
 		"Draw a corner",
 		DRAW_FLAG_CORNERED,
@@ -1420,6 +1428,7 @@ struct event_type event_table[] =
 	{    "DISPLAY UPDATE",                         EVENT_FLAG_OUTPUT,   "Trigers when display is updated."        },
 	{    "DOUBLE-CLICKED ",                        EVENT_FLAG_MOUSE,    "Triggers when mouse is double-clicked"   },
 	{    "END OF PATH",                            EVENT_FLAG_MAP,      "Triggers when walking the last room."    },
+	{    "END OF RUN",                             EVENT_FLAG_MAP,      "Triggers when running the last room."    },
 	{    "GAG ",                                   EVENT_FLAG_GAG,      "Triggers on gag events."                 },
 	{    "HOUR",                                   EVENT_FLAG_TIME,     "Triggers each hour or given hour."       },
 	{    "IAC ",                                   EVENT_FLAG_TELNET,   "Triggers on telopt negotiation."         },
@@ -1459,6 +1468,7 @@ struct event_type event_table[] =
 	{    "PROGRAM START",                          EVENT_FLAG_SYSTEM,   "Triggers when main session starts."      },
 	{    "PROGRAM TERMINATION",                    EVENT_FLAG_SYSTEM,   "Triggers when main session exists."      },
 	{    "READ ERROR",                             EVENT_FLAG_SYSTEM,   "Triggers when the read command fails."   },
+	{    "RECEIVED ERROR",                         EVENT_FLAG_SYSTEM,   "Triggers when an error is received."     },
 	{    "RECEIVED INPUT",                         EVENT_FLAG_INPUT,    "Triggers when new input is received."    },
 	{    "RECEIVED KEYPRESS",                      EVENT_FLAG_INPUT,    "Triggers when a keypress is received."   },
 	{    "RECEIVED LINE",                          EVENT_FLAG_OUTPUT,   "Triggers when a new line is received."   },

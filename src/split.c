@@ -167,9 +167,9 @@ void init_split(struct session *ses, int top_row, int top_col, int bot_row, int 
 	}
 
 
-	check_all_events(ses, SUB_ARG, 0, 4, "SCREEN SPLIT FILL", ntos(ses->split->top_row), ntos(ses->split->top_col), ntos(ses->split->bot_row), ntos(ses->split->bot_col));
+	check_all_events(ses, SUB_ARG, 0, 4, "SCREEN SPLIT FILL", ntos(ses->split->top_row), ntos(ses->split->top_col), ntos(ses->split->bot_row), ntos(ses->split->bot_col), ntos(ses->split->sav_top_row), ntos(ses->split->sav_bot_row), ntos(ses->split->sav_top_col), ntos(ses->split->sav_bot_col));
 
-	if (!check_all_events(ses, SUB_ARG, 0, 4, "CATCH SCREEN SPLIT FILL", ntos(ses->split->top_row), ntos(ses->split->top_col), ntos(ses->split->bot_row), ntos(ses->split->bot_col)))
+	if (!check_all_events(ses, SUB_ARG, 0, 8, "CATCH SCREEN SPLIT FILL", ntos(ses->split->top_row), ntos(ses->split->top_col), ntos(ses->split->bot_row), ntos(ses->split->bot_col), ntos(ses->split->sav_top_row), ntos(ses->split->sav_bot_row), ntos(ses->split->sav_top_col), ntos(ses->split->sav_bot_col)))
 	{
 		if (!HAS_BIT(ses->flags, SES_FLAG_SCROLLSPLIT))
 		{

@@ -37,7 +37,7 @@ DO_COMMAND(do_class)
 
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 	arg = sub_arg_in_braces(ses, arg, arg2, GET_ONE, SUB_VAR|SUB_FUN);
-	arg = sub_arg_in_braces(ses, arg, arg3, GET_ONE, SUB_VAR|SUB_FUN);
+	arg = sub_arg_in_braces(ses, arg, arg3, GET_ALL, SUB_VAR|SUB_FUN);
 
 	if (*arg1 == 0)
 	{
@@ -109,6 +109,21 @@ int count_class(struct session *ses, struct listnode *group)
 	return cnt;
 }
 
+DO_CLASS(class_assign)
+{
+	char *tmp = ses->group;
+
+	ses->group = strdup(arg1);
+
+	script_driver(ses, LIST_COMMAND, arg2);
+
+	free(ses->group);
+
+	ses->group = tmp;
+
+	return ses;
+}
+
 DO_CLASS(class_clear)
 {
 	int type, index;
@@ -157,7 +172,7 @@ DO_CLASS(class_close)
 		{
 			show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN CLOSED.", arg1);
 
-			update_node_list(ses->list[LIST_CLASS], arg1, "", "0","");
+			update_node_list(ses->list[LIST_CLASS], arg1, "", "0", node->arg4);
 
 			if (!strcmp(ses->group, arg1))
 			{
@@ -254,9 +269,9 @@ DO_CLASS(class_load)
 
 	file = fmemopen(node->data, (size_t) atoi(node->arg4), "r");
 
-	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN LOADED FROM MEMORY.", arg1);
-
 	read_file(ses, file, arg1);
+
+	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN LOADED FROM MEMORY.", arg1);
 
 	return ses;
 }
@@ -280,7 +295,7 @@ DO_CLASS(class_open)
 
 		count = atoi(ses->list[LIST_CLASS]->list[0]->arg3);
 
-		update_node_list(ses->list[LIST_CLASS], arg1, "", ntos(--count), "");
+		update_node_list(ses->list[LIST_CLASS], arg1, "", ntos(--count), node->arg4);
 
 		show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN OPENED AND ACTIVATED.", arg1);
 

@@ -2,19 +2,11 @@
 
   - Editor
 
-  - make #line quiet #line capture work.
+  - Consider raising the BUFFER UPDATE (or perhaps a different event) when paging up/down
 
-  - improve screen fill default
+  - Add screen and line clear VT events, also /ec
 
-  - Add screen and line clear VT events
-
-  - Add easy way to check if session is foreground.
-
-  - check that desktop dimensions are inherited by sessions
-
-  - memory allocation error check.
-
-  - example script for two sessions in one screen.
+  - Add a way to set env variables either 1) for the current process, and/or 2) as a parameter to #system (i.e. after fork in the child process).
 
 * STUFF THAT IS PROBABLY GONNA GET DONE
 
@@ -83,7 +75,6 @@
 
   - make #path load bi-directional.
 
-  - class bla assign {stuff} feature?
   - add class specific debug
   - better class event and class size handling ?
 
@@ -163,7 +154,7 @@
 
 * ROADMAP
 
-  - dictionary +
+  - dictionary +tabbing
 
   - editor
 

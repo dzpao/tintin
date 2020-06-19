@@ -108,14 +108,14 @@ DO_COMMAND(do_map)
 			{
 				if (map_table[cnt].check > 0 && ses->map == NULL)
 				{
-					show_error(ses, LIST_COMMAND, "#MAP: This session has no map data. Use #map create or #map read to create one.");
-					
+					show_error(ses, LIST_COMMAND, "#MAP %s: This session has no map data. Use #map create to create one.", map_table[cnt].name);
+
 					pop_call();
 					return ses;
 				}
 				if (map_table[cnt].check > 1 && ses->map->room_list[ses->map->in_room] == NULL)
 				{
-					show_error(ses, LIST_COMMAND, "#MAP: You are not inside the map. Use #map goto to enter it.");
+					show_error(ses, LIST_COMMAND, "#MAP %s: You are not inside the map. Use #map goto to enter it.", map_table[cnt].name);
 
 					pop_call();
 					return ses;
@@ -2376,7 +2376,7 @@ void show_vtmap(struct session *ses)
 
 char *draw_room(struct session *ses, struct room_data *room, int line, int x, int y)
 {
-	static char buf[201], *room_color, room_left[101], room_right[101];
+	static char buf[201], *room_color, room_left[101], room_right[101], room_symbol[101];
 	int index, symsize = 1, exits, exit1, exit2, room1, room2, offset, flags = 0;
 //	struct room_data * room_grid[11];
 
@@ -2388,7 +2388,9 @@ char *draw_room(struct session *ses, struct room_data *room, int line, int x, in
 
 	if (room && room->vnum)
 	{
-		symsize = strip_color_strlen(ses, room->symbol);
+		substitute(ses, room->symbol, room_symbol, SUB_VAR|SUB_FUN);
+
+		symsize = strip_color_strlen(ses, room_symbol);
 
 		if (HAS_BIT(room->flags, ROOM_FLAG_PATH) && room->search_stamp == ses->map->search->stamp)
 		{
@@ -2729,7 +2731,7 @@ char *draw_room(struct session *ses, struct room_data *room, int line, int x, in
 				}
 				else if (symsize > 1)
 				{
-					cat_sprintf(buf, "%s%-3s", ses->map->color[MAP_COLOR_SYMBOL], room->symbol);
+					cat_sprintf(buf, "%s%-3s", ses->map->color[MAP_COLOR_SYMBOL], room_symbol);
 				}
 				else
 				{
@@ -2744,9 +2746,9 @@ char *draw_room(struct session *ses, struct room_data *room, int line, int x, in
 							cat_sprintf(buf, " ");
 						}
 
-						if (*room->symbol != ' ' && symsize == 1)
+						if (*room_symbol != ' ' && symsize == 1)
 						{
-							cat_sprintf(buf, "%s%-1s", ses->map->color[MAP_COLOR_SYMBOL], room->symbol);
+							cat_sprintf(buf, "%s%-1s", ses->map->color[MAP_COLOR_SYMBOL], room_symbol);
 						}
 						else
 						{
@@ -2832,7 +2834,7 @@ char *draw_room(struct session *ses, struct room_data *room, int line, int x, in
 					{
 						if (symsize == 1)
 						{
-							cat_sprintf(buf, "%s%s%-1s%s", room_left, ses->map->color[MAP_COLOR_SYMBOL], room->symbol, room_right);
+							cat_sprintf(buf, "%s%s%-1s%s", room_left, ses->map->color[MAP_COLOR_SYMBOL], room_symbol, room_right);
 						}
 						else
 						{
@@ -3151,24 +3153,24 @@ char *draw_room(struct session *ses, struct room_data *room, int line, int x, in
 					}
 					else if (symsize > 3)
 					{
-						cat_sprintf(buf, "%s%-5s", ses->map->color[MAP_COLOR_SYMBOL], room->symbol);
+						cat_sprintf(buf, "%s%-5s", ses->map->color[MAP_COLOR_SYMBOL], room_symbol);
 					}
 					else if (HAS_BIT(room->flags, ROOM_FLAG_VOID))
 					{
-						if (*room->symbol != ' ' && symsize == 1)
+						if (*room_symbol != ' ' && symsize == 1)
 						{
 							if (room->exit_dirs == (MAP_DIR_E|MAP_DIR_W))
 							{
-								cat_sprintf(buf, "%s-%s%s%s-", ses->map->color[MAP_COLOR_EXIT], ses->map->color[MAP_COLOR_SYMBOL], room->symbol, ses->map->color[MAP_COLOR_EXIT]);
+								cat_sprintf(buf, "%s-%s%s%s-", ses->map->color[MAP_COLOR_EXIT], ses->map->color[MAP_COLOR_SYMBOL], room_symbol, ses->map->color[MAP_COLOR_EXIT]);
 							}
 							else
 							{
-								cat_sprintf(buf, "%s %-2s", ses->map->color[MAP_COLOR_SYMBOL], room->symbol);
+								cat_sprintf(buf, "%s %-2s", ses->map->color[MAP_COLOR_SYMBOL], room_symbol);
 							}
 						}
-						else if (*room->symbol != ' ' && strip_color_strlen(ses, room->symbol) > 1)
+						else if (*room_symbol != ' ' && strip_color_strlen(ses, room_symbol) > 1)
 						{
-							cat_sprintf(buf, "%s %-2s", ses->map->color[MAP_COLOR_SYMBOL], room->symbol);
+							cat_sprintf(buf, "%s %-2s", ses->map->color[MAP_COLOR_SYMBOL], room_symbol);
 						}
 						else
 						{
@@ -3196,13 +3198,13 @@ char *draw_room(struct session *ses, struct room_data *room, int line, int x, in
 					}
 					else
 					{
-						if (strip_color_strlen(ses, room->symbol) <= 1)
+						if (symsize <= 1)
 						{
-							cat_sprintf(buf, "%s%s%-1s%s", room_left, ses->map->color[MAP_COLOR_SYMBOL], room->symbol, room_right);
+							cat_sprintf(buf, "%s%s%-1s%s", room_left, ses->map->color[MAP_COLOR_SYMBOL], room_symbol, room_right);
 						}
 						else
 						{
-							cat_sprintf(buf, "%s%s%-3s", room_color, ses->map->color[MAP_COLOR_SYMBOL], room->symbol);
+							cat_sprintf(buf, "%s%s%-3s", room_color, ses->map->color[MAP_COLOR_SYMBOL], room_symbol);
 						}
 					}
 				}
@@ -3405,9 +3407,9 @@ char *draw_room(struct session *ses, struct room_data *room, int line, int x, in
 	}
 	else
 	{
-		if (HAS_BIT(ses->map->flags, MAP_FLAG_SYMBOLGRAPHICS) && room->symbol[0] && room->symbol[0] != ' ')
+		if (HAS_BIT(ses->map->flags, MAP_FLAG_SYMBOLGRAPHICS) && room_symbol[0] && room_symbol[0] != ' ')
 		{
-			sprintf(buf, "%s%-1s", room_color, room->symbol);
+			sprintf(buf, "%s%-1s", room_color, room_symbol);
 		}
 		else
 		{
@@ -5964,7 +5966,7 @@ DO_MAP(map_get)
 			{
 				cat_sprintf(exits, "{%s}{%d}", exit->name, exit->vnum);
 			}
-			set_nest_node_ses(ses, arg2, "{area}{%s}{color}{%s}{data}{%s}{desc}{%s}{direction}{%d}{exits}{%s}{flags}{%d}{id}{%d}{name}{%s}{note}{%s}{pathdir}{%s}{symbol}{%s}{terrain}{%s}{vnum}{%d}{weight}{%.3f}", room->area, room->color, room->data, room->desc, ses->map->dir, exits, room->flags, room->id, room->name, room->note, dir_to_exit(ses, ses->map->dir), room->symbol, room->terrain, room->vnum, room->weight);
+			set_nest_node_ses(ses, arg2, "{area}{%s}{color}{%s}{data}{%s}{desc}{%s}{direction}{%d}{exits}{%s}{flags}{%d}{id}{%s}{name}{%s}{note}{%s}{pathdir}{%s}{symbol}{%s}{terrain}{%s}{vnum}{%d}{weight}{%.3f}", room->area, room->color, room->data, room->desc, ses->map->dir, exits, room->flags, room->id, room->name, room->note, dir_to_exit(ses, ses->map->dir), room->symbol, room->terrain, room->vnum, room->weight);
 		}
 		else if (is_abbrev(arg1, "roomarea"))
 		{

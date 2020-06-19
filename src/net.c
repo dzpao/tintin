@@ -310,12 +310,14 @@ int read_buffer_mud(struct session *ses)
 	else
 #endif
 	size = read(ses->socket, buffer, BUFFER_SIZE - 1);
-	
+
 	if (size <= 0)
 	{
 		pop_call();
 		return FALSE;
 	}
+	buffer[size] = 0;
+
 	ses->read_len = client_translate_telopts(ses, buffer, size);
 
 	pop_call();

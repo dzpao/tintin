@@ -465,92 +465,14 @@ int client_translate_telopts(struct session *ses, unsigned char *src, int cplen)
 					}
 					continue;
 
-				case ASCII_ENQ:
-					if (check_all_events(ses, SUB_ARG, 0, 1, "CATCH VT100 ENQ", gtd->term))
-					{
-						cpsrc++;
-						cplen--;
-						continue;
-					}
-					break;
-
 				default:
-					if (cpsrc[0] == ASCII_ESC)
+					skip = catch_vt102_codes(ses, cpsrc, cplen);
+
+					if (skip)
 					{
-						if (cplen >= 2 && cpsrc[1] == 'Z')
-						{
-							check_all_events(ses, SUB_ARG, 0, 0, "VT100 DECID");
-							cpsrc += 2;
-							cplen -= 2;
-							continue;
-						}
-
-						if (cplen >= 3 && cpsrc[1] == '[')
-						{
-							if (cpsrc[2] == 'c')
-							{
-								check_all_events(ses, SUB_ARG, 0, 0, "VT100 DA");
-								cpsrc += 3;
-								cplen -= 3;
-								continue;
-							}
-
-							if (cplen >= 4)
-							{
-								if (cpsrc[2] == '0' && cpsrc[3] == 'c')
-								{
-									check_all_events(ses, SUB_ARG, 0, 0, "VT100 DA");
-									cpsrc += 4;
-									cplen -= 4;
-									continue;
-								}
-								if (cpsrc[2] >= '5' && cpsrc[2] <= '6' && cpsrc[3] == 'n')
-								{
-									if (cpsrc[2] == '5')
-									{
-										check_all_events(ses, SUB_ARG, 0, 0, "VT100 DSR");
-									}
-									if (cpsrc[2] == '6')
-									{
-										check_all_events(ses, SUB_ARG, 0, 2, "VT100 CPR", ntos(gtd->screen->cols), ntos(gtd->screen->rows));
-									}
-									cpsrc += 4;
-									cplen -= 4;
-									continue;
-								}
-								if (cpsrc[2] == '0' && cpsrc[3] == 'c')
-								{
-									check_all_events(ses, SUB_ARG, 0, 0, "VT100 DA");
-									cpsrc += 4;
-									cplen -= 4;
-									continue;
-								}
-							}
-						}
-
-						if (cplen >= 3 && cpsrc[1] == ']')
-						{
-							char osc[BUFFER_SIZE];
-
-							for (skip = 2 ; cplen >= skip ; skip++)
-							{
-								if (cpsrc[skip] == ASCII_BEL)
-								{
-									break;
-								}
-							}
-							sprintf(osc, "%.*s", skip - 2, cpsrc + 2);
-
-							check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "VT100 OSC", osc);
-
-							if (check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "CATCH VT100 OSC", osc))
-							{
-								cpsrc += skip;
-								cplen -= skip;
-
-								continue;
-							}
-						}
+						cpsrc += skip;
+						cplen -= skip;
+						continue;
 					}
 
 					if (HAS_BIT(ses->telopts, TELOPT_FLAG_PROMPT))

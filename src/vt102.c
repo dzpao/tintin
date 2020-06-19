@@ -1284,3 +1284,104 @@ int interpret_vt102_codes(struct session *ses, char *str, int real)
 	return TRUE;
 }
 
+int catch_vt102_codes(struct session *ses, unsigned char *str, int cplen)
+{
+	int skip = 0;
+
+	push_call("catch_vt102_codes(%p)",str);
+
+	switch (str[0])
+	{
+		case ASCII_ENQ:
+			if (check_all_events(ses, SUB_ARG, 0, 1, "CATCH VT100 ENQ", gtd->term))
+			{
+				pop_call();
+				return 1;
+			}
+			pop_call();
+			return 0;
+			
+		case ASCII_ESC:
+			break;
+
+		default:
+			pop_call();
+			return 0;
+	}
+
+	switch (str[1])
+	{
+		case '\0':
+			break;
+
+		case 'Z':
+			check_all_events(ses, SUB_ARG, 0, 0, "VT100 DECID");
+			pop_call();
+			return 2;
+
+		case '[':
+			if (str[2] == 'c')
+			{
+				check_all_events(ses, SUB_ARG, 0, 0, "VT100 DA");
+				pop_call();
+				return 3;
+			}
+
+			if (str[3])
+			{
+				if (str[2] == '0' && str[3] == 'c')
+				{
+					check_all_events(ses, SUB_ARG, 0, 0, "VT100 DA");
+					pop_call();
+					return 4;
+				}
+
+				if (str[2] >= '5' && str[2] <= '6' && str[3] == 'n')
+				{
+					if (str[2] == '5')
+					{
+						check_all_events(ses, SUB_ARG, 0, 0, "VT100 DSR");
+					}
+					if (str[2] == '6')
+					{
+						check_all_events(ses, SUB_ARG, 0, 2, "VT100 CPR", ntos(gtd->screen->cols), ntos(gtd->screen->rows));
+					}
+					pop_call();
+					return 4;
+				}
+
+				if (str[2] == '0' && str[3] == 'c')
+				{
+					check_all_events(ses, SUB_ARG, 0, 0, "VT100 DA");
+					pop_call();
+					return 4;
+				}
+			}
+			break;
+
+		case ']':
+			{
+				char osc[BUFFER_SIZE];
+
+				for (skip = 2 ; cplen >= skip && skip < BUFFER_SIZE ; skip++)
+				{
+					if (str[skip] == ASCII_BEL)
+					{
+						break;
+					}
+				}
+				sprintf(osc, "%.*s", skip - 2, str + 2);
+
+				check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "VT100 OSC", osc);
+
+				if (check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "CATCH VT100 OSC", osc))
+				{
+					pop_call();
+					return skip;
+				}
+			}
+			break;
+	}
+	pop_call();
+	return 0;
+}

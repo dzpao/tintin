@@ -412,7 +412,7 @@ DO_COMMAND(do_write)
 
 	int i, j, fix, cnt = 0;
 
-	arg = get_arg_in_braces(ses, arg, arg1, GET_ONE);
+	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 	arg = get_arg_in_braces(ses, arg, arg2, GET_ONE);
 
 	if (*arg1 == 0)

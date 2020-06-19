@@ -418,7 +418,7 @@ int find_command(char *command)
 		return -1;
 	}
 
-	if (isalpha((int) *command))
+	if (isalpha((int) *command) && command[1] != 0)
 	{
 		for (cmd = gtd->command_ref[tolower((int) *command) - 'a'] ; *command_table[cmd].name ; cmd++)
 		{

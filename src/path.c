@@ -129,7 +129,7 @@ DO_PATH(path_stop)
 	}
 	else
 	{
-		if (root->list[root->update]->val64)
+		if (root->update < root->used && root->list[root->update]->val64)
 		{
 			for (index = 0 ; index < root->used ; index++)
 			{
@@ -499,6 +499,7 @@ DO_PATH(path_run)
 			{
 				script_driver(ses, LIST_COMMAND, root->list[root->update++]->arg1);
 			}
+			check_all_events(ses, SUB_ARG|SUB_SEC, 0, 0, "END OF RUN");
 		}
 	}
 
@@ -608,16 +609,15 @@ DO_PATH(path_zip)
 	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
 	int i, cnt;
 
-	cnt   =  1;
+	cnt   = 1;
+	*arg1 = 0;
 
-	*arg1 =  0;
-	*arg2 = 0;
 
 	for (i = 0 ; i < root->used ; i++)
 	{
-		if (search_node_list(root, root->list[i]->arg1) == NULL || strlen(root->list[i]->arg1) != 1)
+		if (search_node_list(ses->list[LIST_PATHDIR], root->list[i]->arg1) == NULL || strlen(root->list[i]->arg1) != 1)
 		{
-			if (i && search_node_list(root, root->list[i - 1]->arg1) != NULL && strlen(root->list[i - 1]->arg1) == 1)
+			if (i && search_node_list(ses->list[LIST_PATHDIR], root->list[i - 1]->arg1) != NULL && strlen(root->list[i - 1]->arg1) == 1)
 			{
 				cat_sprintf(arg1, "%c", COMMAND_SEPARATOR);
 			}
@@ -642,11 +642,14 @@ DO_PATH(path_zip)
 		}
 	}
 
+	cnt   = 1;
+	*arg2 = 0;
+
 	for (i = root->used - 1 ; i >= 0 ; i--)
 	{
-		if (search_node_list(root, root->list[i]->arg2) == NULL || strlen(root->list[i]->arg2) != 1)
+		if (search_node_list(ses->list[LIST_PATHDIR], root->list[i]->arg2) == NULL || strlen(root->list[i]->arg2) != 1)
 		{
-			if (i != root->used - 1 && search_node_list(root, root->list[i + 1]->arg2) != NULL && strlen(root->list[i + 1]->arg2) == 1)
+			if (i != root->used - 1 && search_node_list(ses->list[LIST_PATHDIR], root->list[i + 1]->arg2) != NULL && strlen(root->list[i + 1]->arg2) == 1)
 			{
 				cat_sprintf(arg2, "%c", COMMAND_SEPARATOR);
 			}
@@ -943,6 +946,8 @@ void check_append_path(struct session *ses, char *forward, char *backward, int f
 	{
 		if ((node = search_node_list(ses->list[LIST_PATHDIR], forward)))
 		{
+			show_debug(ses, LIST_PATHDIR, "#DEBUG PATHDIR {%s} {%s}", node->arg1, node->arg2);
+
 			create_node_list(root, node->arg1, node->arg2, "0", "");
 
 			root->update = root->used;
@@ -952,10 +957,14 @@ void check_append_path(struct session *ses, char *forward, char *backward, int f
 	{
 		if ((node = search_node_list(ses->list[LIST_PATHDIR], forward)))
 		{
+			show_debug(ses, LIST_PATHDIR, "#DEBUG PATHDIR {%s} {%s}", node->arg1, node->arg2);
+
 			create_node_list(root, node->arg1, node->arg2, "0", "");
 		}
 		else
 		{
+			show_debug(ses, LIST_PATHDIR, "#DEBUG PATHDIR {%s} {%s}", forward, backward);
+
 			create_node_list(root, forward, backward, "0", "");
 		}
 	}

@@ -139,8 +139,8 @@ DO_COMMAND(do_snoop)
 	struct session *sesptr = ses;
 
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
-	arg = sub_arg_in_braces(ses, arg, arg2, GET_ALL, SUB_VAR|SUB_FUN);
-
+	arg = sub_arg_in_braces(ses, arg, arg2, GET_ONE, SUB_VAR|SUB_FUN);
+	
 	if (*arg1)
 	{
 		sesptr = find_session(arg1);

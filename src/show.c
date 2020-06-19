@@ -176,6 +176,8 @@ void show_error(struct session *ses, int index, char *format, ...)
 	vasprintf(&buffer, format, args);
 	va_end(args);
 
+	check_all_events(ses, SUB_ARG|SUB_SEC, 0, 1, "RECEIVED ERROR", buffer);
+
 	if (gtd->level->verbose || gtd->level->debug)
 	{
 		tintin_puts2(ses, buffer);
@@ -488,6 +490,18 @@ void tintin_puts3(struct session *ses, char *string)
 	if (ses == NULL)
 	{
 		ses = gtd->ses;
+	}
+
+	if (ses->line_capturefile)
+	{
+		if (ses->line_captureindex == 1)
+		{
+			set_nest_node_ses(ses, ses->line_capturefile, "{%d}{%s}", ses->line_captureindex++, string);
+		}
+		else
+		{
+			add_nest_node_ses(ses, ses->line_capturefile, "{%d}{%s}", ses->line_captureindex++, string);
+		}
 	}
 
 	if (gtd->level->quiet && gtd->level->verbose == 0)

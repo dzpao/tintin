@@ -117,7 +117,7 @@ DO_PORT(port_initialize)
 
 	tintin_printf(ses, "#TRYING TO LAUNCH '%s' ON PORT '%s'.", arg1, arg2);
 
-	sprintf(temp, "{localport} {%d} {%.*s}", atoi(arg2), PATH_SIZE, file);
+	sprintf(temp, "{localhost} {%d} {%.*s}", atoi(arg2), PATH_SIZE, file);
 
 	port = atoi(arg2);
 
@@ -566,8 +566,10 @@ int process_port_input(struct session *ses, struct port_data *buddy)
 		if (buddy->intop > BUFFER_SIZE / 4)
 		{
 			port_socket_printf(ses, buddy, "\e[1;31mYou overflowed your input buffer, you must reconnect.\n");
+			input[BUFFER_SIZE / 2] = 0;
+			port_socket_printf(ses, buddy, "%s\n", input);
 			port_log_printf(ses, buddy, "Buffer overflow, closing connection.");
-			
+
 			pop_call();
 			return -1;
 		}

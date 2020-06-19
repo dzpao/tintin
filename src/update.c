@@ -863,6 +863,11 @@ void path_update(void)
 				show_debug(ses, LIST_COMMAND, "#DEBUG PATH {%s}", node->arg1);
 
 				script_driver(ses, LIST_COMMAND, node->arg1);
+
+				if (root->update == root->used)
+				{
+					check_all_events(ses, SUB_ARG|SUB_SEC, 0, 0, "END OF RUN");
+				}
 			}
 			break;
 		}

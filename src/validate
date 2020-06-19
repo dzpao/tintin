@@ -190,6 +190,8 @@ bla
 #if {&{bla} != 0} {error 22: #class clear malfunction}
 #class bla load
 #if {&{bla} == 0} {error 23: #class load malfunction}
+#class bla clear
+#class bla load
 #class bla kill
 
 

@@ -443,3 +443,121 @@
 
 #macro {\e[1;5D\e[1;5A} {#undelay {move};#cursor reset_macro;nw}
 #macro {\e[1;5A\e[1;5D} {#undelay {move};#cursor reset_macro;nw}
+
+#nop -------------------------------------------------------------------------
+#nop Place tells in the top 5 lines of the screen
+#nop -------------------------------------------------------------------------
+
+#VARIABLE {COMMS} {}
+
+#ACTION {~%1 tells you %2}
+{
+	addtowin %1 tells you %2
+}
+
+#ACTION {~%1 chats %2}
+{
+	addtowin %1 chats %2
+}
+
+#ALIAS {addtowin}
+{
+	#format temp {%w} {%0};
+
+	#loop {1} {&temp[]} {cnt}
+	{
+		#list COMMS ins -1 {$temp[$cnt]}
+	};
+	#while {&COMMS[] > 100}
+	{
+		#list COMMS del 1
+	};
+	showwin
+}
+
+#ALIAS {showwin}
+{
+	#screen clear square 1 1 5 -1;
+
+	#list temp create $COMMS[-5..-1];
+
+	#loop {1} {&temp[]} {cnt}
+	{
+		#regexp {$temp[$cnt]} {^$}
+		{
+			#nop
+		};
+		#else
+		{
+			#line ignore #showme {$temp[$cnt]} {$cnt} {1}
+		}
+	}
+}
+
+#ALIAS {test}
+{
+	#split 5 1;
+	#showme <138>Bubba tells you 'hello';
+	#showme <158>Pamela chats 'bye';
+}
+
+#nop -------------------------------------------------------------------------
+#nop Display two sessions next to each other
+#nop -------------------------------------------------------------------------
+
+#event {SCREEN RESIZE}
+{
+	#var ROWS %0;
+	#var COLS %1;
+	#draw line 1 {$COLS / 2} -3 {$COLS / 2};
+
+	#left #screen scroll 1 1 -3 {$COLS / 2 - 1};
+	#right #screen scroll 1 {$COLS / 2 + 1} -3 -1;
+}
+
+#event {PROGRAM START}
+{
+	#screen raise SCREEN RESIZE;
+	#ses right localhost 4321;
+	#ses left localhost 4321;
+}
+
+#event {SESSION CREATED}
+{
+	#var name %0;
+}
+
+#event {SESSION ACTIVATED}
+{
+	#gts #var active %0;
+}
+
+#event {RECEIVED OUTPUT}
+{
+	#if {"@gts{$active}" == "$name"}
+	{
+		#return;
+	};
+
+	#switch {"$name"}
+	{
+		#case {"left"} {#draw Red boxed foreground buffer 1 1 -3 {$COLS / 2 - 1};};
+		#case {"right"}{#draw Red boxed foreground buffer 1 {$COLS / 2 + 1} -3 -1};
+	};
+}
+
+#nop -------------------------------------------------------------------------
+#nop 
+#nop -------------------------------------------------------------------------
+
+#nop -------------------------------------------------------------------------
+#nop 
+#nop -------------------------------------------------------------------------
+
+#nop -------------------------------------------------------------------------
+#nop 
+#nop -------------------------------------------------------------------------
+
+#nop -------------------------------------------------------------------------
+#nop 
+#nop -------------------------------------------------------------------------

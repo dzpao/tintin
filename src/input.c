@@ -217,9 +217,11 @@ void read_line(char *input, int len)
 
 	if (gtd->macro_buf[0] == ASCII_ESC)
 	{
-		strcpy(input, gtd->macro_buf);
+		char buf[BUFFER_SIZE];
 
-		convert_meta(input, gtd->macro_buf, FALSE);
+		strcpy(buf, gtd->macro_buf);
+
+		convert_meta(buf, gtd->macro_buf, FALSE);
 	}
 
 	while (gtd->macro_buf[0])
@@ -303,6 +305,7 @@ void read_line(char *input, int len)
 				break;
 		}
 	}
+	check_all_events(gtd->ses, SUB_ARG|SUB_SIL, 0, 2, "PROCESSED KEYPRESS", input, ntos(index));
 }
 
 void read_key(char *input, int len)
@@ -439,13 +442,13 @@ int check_key(char *input, int len)
 					partial = TRUE;
 				}
 			}
+			if (partial)
+			{
+				pop_call();
+				return TRUE;
+			}
 		}
 
-		if (partial)
-		{
-			pop_call();
-			return TRUE;
-		}
 
 		if (!HAS_BIT(gtd->ses->telopts, TELOPT_FLAG_SGA) || HAS_BIT(gtd->ses->telopts, TELOPT_FLAG_ECHO) || gtd->ses->input->buf[0] == gtd->tintin_char)
 		{
@@ -503,7 +506,7 @@ int check_key(char *input, int len)
 									return TRUE;
 
 								default:
-									print_stdout("unknownmouse input error (%s)\n", gtd->macro_buf);
+									print_stdout("unknownmouse input error (%s)\n", str_convert_meta(gtd->macro_buf, TRUE));
 									gtd->macro_buf[0] = 0;
 									pop_call();
 									return TRUE;

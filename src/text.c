@@ -136,6 +136,7 @@ int word_wrap(struct session *ses, char *textin, char *textout, int flags, int *
 
 	cur_col      = ses->cur_col;
 	ses->cur_col = 1;
+	cur_space    = 1;
 
 	cur_width    = 0;
 	*width       = 0;
@@ -336,6 +337,7 @@ int word_wrap_split(struct session *ses, char *textin, char *textout, int wrap, 
 	cur_width  = 0;
 	*width     = 0;
 	cur_col    = 1;
+	cur_space  = cur_col;
 
 	if (HAS_BIT(flags, WRAP_FLAG_SPLIT) && end == 0)
 	{

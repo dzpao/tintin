@@ -174,7 +174,7 @@
 #define LIST_SIZE                        2
 
 #define CLIENT_NAME              "TinTin++"
-#define CLIENT_VERSION           "2.02.03b"
+#define CLIENT_VERSION           "2.02.04b"
 
 #define XT_E                            0x27
 #define XT_C                            0x5B
@@ -445,31 +445,32 @@ enum operators
 #define DRAW_FLAG_CIRCLED             BV06
 #define DRAW_FLAG_COLOR               BV07
 #define DRAW_FLAG_CONVERT             BV08
-#define DRAW_FLAG_COPY                BV30 // new
 #define DRAW_FLAG_CORNERED            BV09
 #define DRAW_FLAG_CROSSED             BV10
 #define DRAW_FLAG_FILLED              BV11
-#define DRAW_FLAG_GRID                BV12
-#define DRAW_FLAG_HOR                 BV13
-#define DRAW_FLAG_HUGE                BV14
-#define DRAW_FLAG_JEWELED             BV15
-#define DRAW_FLAG_LEFT                BV16
-#define DRAW_FLAG_LINED               BV17
-#define DRAW_FLAG_NUMBERED            BV18
-#define DRAW_FLAG_PRUNED              BV19
-#define DRAW_FLAG_RIGHT               BV20 
-#define DRAW_FLAG_ROUNDED             BV21
-#define DRAW_FLAG_SCROLL              BV22
-#define DRAW_FLAG_SHADOWED            BV23
-#define DRAW_FLAG_TEED                BV24
-#define DRAW_FLAG_TOP                 BV25
-#define DRAW_FLAG_TRACED              BV26
-#define DRAW_FLAG_TUBED               BV27
-#define DRAW_FLAG_UTF8                BV28
-#define DRAW_FLAG_VER                 BV29
-#define DRAW_FLAG_CURSIVE             BV30
-#define DRAW_FLAG_FAT                 BV31
-#define DRAW_FLAG_SANSSERIF           BV32
+#define DRAW_FLAG_FOREGROUND          BV12
+#define DRAW_FLAG_GRID                BV13
+#define DRAW_FLAG_HOR                 BV14
+#define DRAW_FLAG_HUGE                BV15
+#define DRAW_FLAG_JEWELED             BV16
+#define DRAW_FLAG_LEFT                BV17
+#define DRAW_FLAG_LINED               BV18
+#define DRAW_FLAG_NUMBERED            BV19
+#define DRAW_FLAG_PRUNED              BV20
+#define DRAW_FLAG_RIGHT               BV21 
+#define DRAW_FLAG_ROUNDED             BV22
+#define DRAW_FLAG_SCROLL              BV23
+#define DRAW_FLAG_SHADOWED            BV24
+#define DRAW_FLAG_TEED                BV25
+#define DRAW_FLAG_TOP                 BV26
+#define DRAW_FLAG_TRACED              BV27
+#define DRAW_FLAG_TUBED               BV28
+#define DRAW_FLAG_UTF8                BV29
+#define DRAW_FLAG_VER                 BV30
+#define DRAW_FLAG_CURSIVE             BV31
+#define DRAW_FLAG_FAT                 BV32
+#define DRAW_FLAG_SANSSERIF           BV33
+
 
 #define EVENT_FLAG_SILENT             BV01 // unused
 
@@ -1916,6 +1917,7 @@ extern DO_COMMAND(do_class);
 extern  int count_class(struct session *ses, struct listnode *group);
 extern void parse_class(struct session *ses, char *input, struct listnode *group);
 
+extern DO_CLASS(class_assign);
 extern DO_CLASS(class_clear);
 extern DO_CLASS(class_close);
 extern DO_CLASS(class_kill);
@@ -2233,6 +2235,7 @@ DO_DRAW(draw_blank);
 DO_DRAW(draw_bot_side);
 DO_DRAW(draw_arg);
 DO_DRAW(draw_box);
+DO_DRAW(draw_buffer);
 DO_DRAW(draw_corner);
 DO_DRAW(draw_horizontal_line);
 DO_DRAW(draw_left_side);
@@ -2241,7 +2244,6 @@ DO_DRAW(draw_map);
 DO_DRAW(draw_right_side);
 DO_DRAW(draw_side);
 DO_DRAW(draw_square);
-DO_DRAW(draw_stamp);
 DO_DRAW(draw_rain);
 DO_DRAW(draw_table_grid);
 DO_DRAW(draw_text);
@@ -3063,5 +3065,6 @@ extern int strip_vt102_width(struct session *ses, char *str, int *lines);
 extern int strip_color_strlen(struct session *ses, char *str);
 extern char *strip_vt102_strstr(char *str, char *buf, int *len);
 extern int interpret_vt102_codes(struct session *ses, char *str, int real);
+extern int catch_vt102_codes(struct session *ses, unsigned char *str, int cplen);
 
 #endif

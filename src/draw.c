@@ -118,6 +118,10 @@ DO_COMMAND(do_draw)
 			{
 				SET_BIT(flags, DRAW_FLAG_FILLED);
 			}
+			else if (is_abbrev(arg1, "FOREGROUND"))
+			{
+				SET_BIT(flags, DRAW_FLAG_FOREGROUND);
+			}
 			else if (is_abbrev(arg1, "HORIZONTAL"))
 			{
 				SET_BIT(flags, DRAW_FLAG_HOR);
@@ -232,7 +236,7 @@ DO_COMMAND(do_draw)
 				}
 				else
 				{
-					if (ses != gtd->ses)
+					if (!HAS_BIT(flags, DRAW_FLAG_FOREGROUND) && ses != gtd->ses)
 					{
 						show_message(ses, LIST_COMMAND, "#WARNING: #DRAW %s %d %d %d %d: SESSION IS IN THE BACKGROUND.", draw_table[index].name, top_row, top_col, bot_row, bot_col);
 
@@ -1049,6 +1053,32 @@ DO_DRAW(draw_box)
 	}
 }
 
+DO_DRAW(draw_buffer)
+{
+	char *buf;
+	int cnt, line;
+
+	buf = str_alloc(BUFFER_SIZE);
+
+	if (ses->scroll->line == -1)
+	{
+		line = ses->scroll->used - 1;
+	}
+	else
+	{
+		line = ses->scroll->line;
+	}
+
+	for (cnt = rows ; cnt >= 0 && line - cnt >= 0 ; cnt--)
+	{
+		str_cat_printf(&buf, "{%s}", ses->scroll->buffer[line - cnt]->str);
+	}
+
+	draw_box(ses, top_row, top_col, bot_row, bot_col, rows, cols, flags, color, buf, arg1, arg2);
+
+	str_free(buf);
+}
+
 DO_DRAW(draw_corner)
 {
 	if (*arg)
@@ -1422,12 +1452,6 @@ DO_DRAW(draw_side)
 }
 
 DO_DRAW(draw_square)
-{
-	draw_text(ses, top_row, top_col, bot_row, bot_col, rows, cols, flags, color, arg, arg1, arg2);
-}
-
-
-DO_DRAW(draw_stamp)
 {
 	draw_text(ses, top_row, top_col, bot_row, bot_col, rows, cols, flags, color, arg, arg1, arg2);
 }

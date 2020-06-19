@@ -219,9 +219,12 @@ struct listnode *update_node_list(struct listroot *root, char *arg1, char *arg2,
 			strcpy(arg3, "5");
 		}
 
-		if (strcmp(node->arg3, arg3) != 0)
+		if (list_table[root->type].mode != SORT_PRIORITY)
 		{
-			str_cpy(&node->arg3, arg3);
+			if (strcmp(node->arg3, arg3) != 0)
+			{
+				str_cpy(&node->arg3, arg3);
+			}
 		}
 
 		if (strcmp(node->arg4, arg4) != 0)
@@ -235,6 +238,7 @@ struct listnode *update_node_list(struct listroot *root, char *arg1, char *arg2,
 				if (atof(node->arg3) != atof(arg3))
 				{
 					remove_index_list(root, index);
+					str_cpy(&node->arg3, arg3);
 					insert_node_list(root, node);
 				}
 				break;
@@ -507,27 +511,28 @@ int bsearch_alpha_list(struct listroot *root, char *text, int seek)
 int bsearch_priority_list(struct listroot *root, char *text, char *priority, int seek)
 {
 	int bot, top, val;
-	double srt;
+	double prt, srt;
 
 	bot = 0;
 	top = root->used - 1;
 	val = top;
+	prt = atof(priority);
 
 	while (bot <= top)
 	{
-		srt = atof(priority) - atof(root->list[val]->arg3);
+		srt = atof(root->list[val]->arg3);
 
-		if (!srt)
+		if (srt == prt)
 		{
 			srt = strcmp(text, root->list[val]->arg1);
+
+			if (srt == 0)
+			{
+				return val;
+			}
 		}
 
-		if (srt == 0)
-		{
-			return val;
-		}
-
-		if (srt < 0)
+		if (prt < srt)
 		{
 			top = val - 1;
 		}

@@ -156,19 +156,6 @@ void add_line_buffer(struct session *ses, char *line, int prompt)
 		}
 	}
 */
-	if (ses->line_capturefile)
-	{
-		sprintf(temp, "{%d}{%s}", ses->line_captureindex++, line);
-
-		if (ses->line_captureindex == 1)
-		{
-			set_nest_node_ses(ses, ses->line_capturefile, "%s", temp);
-		}
-		else
-		{
-			add_nest_node_ses(ses, ses->line_capturefile, "%s", temp);
-		}
-	}
 
 	if (HAS_BIT(ses->flags, SES_FLAG_CONVERTMETA))
 	{
@@ -1037,27 +1024,47 @@ DO_BUFFER(buffer_write)
 
 DO_BUFFER(buffer_info)
 {
+	char arg1[BUFFER_SIZE], arg2[BUFFER_SIZE];
+
 	int index, memory;
 
 	check_buffer(ses);
 
-	tintin_printf2(ses, "Scroll row:  %d", ses->scroll->used);
-	tintin_printf2(ses, "Scroll max:  %d", ses->scroll->size);
-	tintin_printf2(ses, "Scroll line: %d", ses->scroll->line);
-	tintin_printf2(ses, "Scroll base: %d", ses->scroll->base);
-	tintin_printf2(ses, "Scroll wrap: %d", ses->scroll->wrap);
+	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);	
+	arg = sub_arg_in_braces(ses, arg, arg2, GET_ONE, SUB_VAR|SUB_FUN);
 
-	tintin_printf2(ses, "");
-
-	memory = 0;
-
-	for (index = 0 ; index < ses->scroll->used ; index++)
+	if (*arg1 == 0)
 	{
-		memory += sizeof(struct buffer_data) + strlen(ses->scroll->buffer[index]->str);
+		tintin_printf2(ses, "Scroll row:  %d", ses->scroll->used);
+		tintin_printf2(ses, "Scroll max:  %d", ses->scroll->size);
+		tintin_printf2(ses, "Scroll line: %d", ses->scroll->line);
+		tintin_printf2(ses, "Scroll base: %d", ses->scroll->base);
+		tintin_printf2(ses, "Scroll wrap: %d", ses->scroll->wrap);
+
+		tintin_printf2(ses, "");
+
+		memory = 0;
+
+		for (index = 0 ; index < ses->scroll->used ; index++)
+		{
+			memory += sizeof(struct buffer_data) + strlen(ses->scroll->buffer[index]->str);
+		}
+		tintin_printf2(ses, "Memory use:  %d", memory);
 	}
+	else if (is_abbrev(arg1, "SAVE") && *arg2)
+	{
+		set_nest_node_ses(ses, arg2, "{SIZE}{%d}", ses->scroll->size);
+		add_nest_node_ses(ses, arg2, "{USED}{%d}", ses->scroll->used);
+		add_nest_node_ses(ses, arg2, "{LINE}{%d}", ses->scroll->line);
+		add_nest_node_ses(ses, arg2, "{BASE}{%d}", ses->scroll->base);
+		add_nest_node_ses(ses, arg2, "{WRAP}{%d}", ses->scroll->wrap);
 
-	tintin_printf2(ses, "Memory use:  %d", memory);
-
+		show_message(ses, LIST_COMMAND, "#BUFFER INFO: SAVED TO {%s}", arg2);
+	}
+	else
+	{
+		show_error(ses, LIST_COMMAND, "#SYNTAX: #BUFFER INFO [SAVE] [<VARIABLE>]");
+	}
 }
 
 

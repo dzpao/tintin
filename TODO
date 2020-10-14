@@ -1,18 +1,37 @@
 * BUGS
 
-  - Editor
+  - save tables with spacing
 
-  - Consider raising the BUFFER UPDATE (or perhaps a different event) when paging up/down
+  - change big-5 / gbk-1 lookup tables to unsigned short decimal arrays
 
-  - Add screen and line clear VT events, also /ec
+  - finish BUFFER_SIZE replacement.
+
+  - WSL faq: #system cmd.exe /c start notepad
+
+  - str_ify ses->more_output
+
+  - update msdp scripts with #line msdp feature
+
+  - refresh input on session switch
+
+  - swap arg1, arg2, arg for do_port
+
+  - https://tintin.sourceforge.io/forum/viewtopic.php?f=5&t=2776
+    Need special casing for non capturing {?!} regex handling.
+
+  - #cursor get word option, maybe get the yank buffer as well.
+
+  - Look into config option to change the working directory
 
   - Add a way to set env variables either 1) for the current process, and/or 2) as a parameter to #system (i.e. after fork in the child process).
 
 * STUFF THAT IS PROBABLY GONNA GET DONE
 
-  - if error pcre.h, need export C_INCLUDE_PATH= where it locate
+  - Finish port proxy support: resizing, input, security
 
-  - #write table variables a bit nicer.
+  - look into transparent drawing
+
+  - if error pcre.h, need export C_INCLUDE_PATH= where it locate
 
   - The #else command could follow a #foreach so as to create "for-else" loops
     in case a loop is not broken.
@@ -32,13 +51,11 @@
   - tabbing on directory structure.
   - tabbing on dictionary
 
-  - Enhance #scan with a scan of the directory structure.
-
+  - #map list {<exits>} breaks on rooms that have e mapped to eu.
   - finish landmarks
   - map sandbox mode support (flags to disable saving?)
   - add ghosting to fix #map flag nofollow exit cmd issues?
   ! #map legend support for unicode graphics.
-  - add step count for #map list and rename distance to weight
   - multi-line room symbols
   - pancake mode to display rooms at all levels and annotations
   - there might be a terrain density bug
@@ -54,6 +71,7 @@
   - more data to #map list saving, and maybe easier sorting of tables.
   - event for failed #map move.
   - look into #send triggering follow map.
+
   - truncate prompt longer than split.
 
   - Make actions with a priority of 0. trigger always
@@ -65,15 +83,12 @@
     #draw titanic
 
   - proper vt100 skip detection for improper color codes.
-  - look into VT100 / #split hybrid mode.
 
-  - I'll look and see if I can make { match both a { and \x7B as it's an annoying issue to debug.
+  - Make { match both a { and \x7B as it's an annoying issue to debug.
 
   - Add VT100 filter to make outside sources respect terminal size constraints, also needed to run bash in vsplit mode.
 
   - Remote script loading
-
-  - make #path load bi-directional.
 
   - add class specific debug
   - better class event and class size handling ?
@@ -81,25 +96,14 @@
   - more potent long-click handling including held down ticks.
 
   - look into discord api / arachnos
- 
+
   - better color syntax highlighting configuration.
 
   - Add #log delete/remove option.
 
-  - See about filling COMMAND_LIST table.
-
   - See about adding SESSIONS to the list table.
 
   - Add debugger to syntax highlighter, substitution highlighing, 256 color support, and variable expansion.
-
-  - look at scripts/bug.tin
-
-  - Add FILE READ <name> event
-  - #buffer events
-  - add KILLED TYPE ARG event, for example KILLED CLASS bla
-  - CAPTURED INPUT event
-  - http://tintin.sourceforge.net/board/viewtopic.php?p=8735#8735 RECEIVED MESSAGE event?
-? - http://tintin.sourceforge.net/board/viewtopic.php?p=8655#8655 FILE OPENED / CLOSED event?
 
   - fix readmud in net.c to not move the cursor on inactive sessions.
 
@@ -116,15 +120,7 @@
 
   - Add JSON support to #scan
 
-  - fix \x00 showme
-
-  - support strikethrough html logging.
-
   - see if #break 2 is possible, maybe #continue 2 as well.
-
-  - Add options to #cursor to implement custom behaviour.
-
-  - toggle global flags with #message all on, #debug all on, etc.
 
   - http://tintin.sourceforge.net/board/viewtopic.php?p=9625 (map undo issue) (not a big issue)
 
@@ -144,7 +140,11 @@
 
 * LOW PRIORITY
 
+  - Add a file handler.
+
   - multi-line buffer searches / captures / deletes
+
+  - multi-line triggers (use nested actions?)
 
   - add color based auto unwrap routine.
 
@@ -176,6 +176,8 @@
 
   - Allow converting tt++ scripts to C.
 
+  - session proxies
+
 --------------------------------------------------------------------------------
 
 * STUFF THAT MIGHT BE IMPLEMENTED
@@ -192,13 +194,9 @@
 
   - SGA disabling
 
-  - CHARSET TELOPT support.
-
   - BINARY TELOPT support.
 
-  - Split pane scrollback (event system?)
-
-  - add #line gag {lines} option or #lines {lines} {gag}.
+  - add #line gag {lines} option
 
   - Add something like #log append $dir/logs/log.txt {%D %H:%M:%S}
 
@@ -224,8 +222,6 @@
   - http://tintin.sourceforge.net/board/viewtopic.php?p=7124
 
   - There's a bug with prompt repetitions with packet patch set.
-
-  - garbage collection for deleted nodes.
 
   - Deal with escaping { } / ; in #script variables.
 
@@ -273,35 +269,20 @@
 
 --------------------------------------------------------------------------------
 
-
-* MISCELANEOUS
-
-- look into Launchpad PPA
-
---------------------------------------------------------------------------------
-
 * STUFF FOR A RAINY DAY
-
-- nestable functions
-
-- Buffer safe strings.
 
 - Fix up ipv6 support in chat.
 
 - Look into packet defragmentation for chat.
 
-- Color code compression, particularly useful with vt map drawing.
-
-- Events for prompt lines.
-
-- Lua scripting
-
 - Look into using speech-dispatcher for text to speech.
-
-- MXP script http://tintin.sourceforge.net/board/viewtopic.php?t=1396
 
 - Add %U (upper) %L (lower) support.
   check https://www.boost.org/doc/libs/1_50_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html
+
+- cursor extension for vim
+
+- interactive script tutorial
 
 -------------------------------------------------------------------------------
 
@@ -313,14 +294,9 @@
 
 -------------------------------------------------------------------------------
 
-* NEW STUFF
+* STUFF THAT WON'T BE IMPLEMENTED
 
-- xterm mouse
-- path improvements
-- remote session
-- map sharing
-- cursor extension for vim
-- interactive script tutorial
+- Lua or any other scripting language, focus is on developing tintin scripting.
 
 -------------------------------------------------------------------------------
 
@@ -329,3 +305,5 @@
 - TinTin++ only allows 1 action triggering per line.
 
 - TinTin++ probably should substitute escapes in if checks.
+
+- TinTin++ is not handling #return inside #regex intuitively.

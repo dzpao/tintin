@@ -1,6 +1,23 @@
 Due to continuous improvements old tintin scripts aren't always compatible
 with new versions. This document tries to list most compatibility conflicts.
 
+TinTin++ 2.02.04
+----------------
+
+01) Variables starting with a number are no longer supported, as per the
+    C standard for naming variables. A warning is generated when trying to
+    do so.
+
+    Keep in mind that #var {8ball} {1} will still work, just that instead of
+    being able to use $8ball you need to use ${8ball} for an explicit
+    variable lookup.
+
+02) Implicit index lookups on undefined variables are no longer supported. If
+    you do something like #if {&target} this needs to be changed to
+    #if {&{target}}.
+
+    The reason for this is that "say I played d&d last night" would evaluate
+    as "say I played d0 last night".
 
 TinTin++ 2.02.00
 ----------------
@@ -80,7 +97,7 @@ TinTin++ 2.01.90
 
     #prompt {text} {substitution} will stay the same.
     #prompt {text} {substitution} {0} will become invalid.
-    #prompt {test] {substitution} {1} will write to the top line.
+    #prompt {text] {substitution} {1} will write to the top line.
     #prompt {text} {substitution} {-1} will write to the bottom / input line.
     #prompt {text} {substitution} {-2} will write to the 2nd line from the
        bottom, which is the default split line.
@@ -199,7 +216,7 @@ TinTin++ 1.99.1
 TinTin++ 1.96.6
 ---------------
 
-    #PATHDIR is now specificly designed to hold a direction, the opposite
+    #PATHDIR is now specifically designed to hold a direction, the opposite
     direction, and the vector of said direction for the #MAP command.
 
 
@@ -271,7 +288,6 @@ TinTin++ 1.88.0
 ---------------
 
 01) #FORMAT has been introduced and replaces a wide variety of commands.
-
 
 02) #MESSAGE, #CONFIG, #IGNORE, #DEBUG are all you need to configure tintin,
     changes made with #CONFIG are written to file with #WRITE.

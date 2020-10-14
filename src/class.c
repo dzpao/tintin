@@ -26,6 +26,45 @@
 
 #include "tintin.h"
 
+#define DO_CLASS(class) struct session *class(struct session *ses, struct listnode *node, char *arg1, char *arg2)
+
+extern DO_CLASS(class_assign);
+extern DO_CLASS(class_clear);
+extern DO_CLASS(class_close);
+extern DO_CLASS(class_kill);
+extern DO_CLASS(class_list);
+extern DO_CLASS(class_load);
+extern DO_CLASS(class_open);
+extern DO_CLASS(class_read);
+extern DO_CLASS(class_save);
+extern DO_CLASS(class_size);
+extern DO_CLASS(class_write);
+
+typedef struct session *CLASS(struct session *ses, struct listnode *node, char *arg1, char *arg2);
+
+struct class_type
+{
+	char                  * name;
+	CLASS                 * fun;
+};
+
+struct class_type class_table[] =
+{
+	{    "ASSIGN",            class_assign           },
+	{    "CLEAR",             class_clear            },
+	{    "CLOSE",             class_close            },
+	{    "KILL",              class_kill             },
+	{    "LIST",              class_list             },
+	{    "LOAD",              class_load             },
+	{    "OPEN",              class_open             },
+	{    "READ",              class_read             },
+	{    "SAVE",              class_save             },
+	{    "SIZE",              class_size             },
+	{    "WRITE",             class_write            },
+	{    "",                  NULL                   },
+};
+
+int count_class(struct session *ses, struct listnode *group);
 
 DO_COMMAND(do_class)
 {
@@ -41,7 +80,7 @@ DO_COMMAND(do_class)
 
 	if (*arg1 == 0)
 	{
-		tintin_header(ses, " CLASSES ");
+		tintin_header(ses, 80, " CLASSES ");
 
 		for (root->update = 0 ; root->update < root->used ; root->update++)
 		{
@@ -76,7 +115,8 @@ DO_COMMAND(do_class)
 			{
 				show_info(ses, LIST_CLASS, "#INFO: CLASS {%s} CREATED", arg1);
 
-				check_all_events(ses, SUB_ARG, 0, 1, "CLASS CREATED", arg1);
+				check_all_events(ses, EVENT_FLAG_CLASS, 0, 1, "CLASS CREATED", arg1);
+				check_all_events(ses, EVENT_FLAG_CLASS, 1, 1, "CLASS CREATED %s", arg1, arg1);
 
 				node = update_node_list(ses->list[LIST_CLASS], arg1, "", arg3, "");
 			}
@@ -128,6 +168,9 @@ DO_CLASS(class_clear)
 {
 	int type, index;
 
+	check_all_events(ses, EVENT_FLAG_CLASS, 0, 1, "CLASS CLEAR", ses->group);
+	check_all_events(ses, EVENT_FLAG_CLASS, 1, 1, "CLASS CLEAR %s", ses->group, ses->group);
+
 	for (type = 0 ; type < LIST_MAX ; type++)
 	{
 		if (!HAS_BIT(ses->list[type]->flags, LIST_FLAG_CLASS))
@@ -176,8 +219,8 @@ DO_CLASS(class_close)
 
 			if (!strcmp(ses->group, arg1))
 			{
-				check_all_events(ses, SUB_ARG, 0, 1, "CLASS DEACTIVATED", ses->group);
-				check_all_events(ses, SUB_ARG, 1, 1, "CLASS DEACTIVATED %s", ses->group, ses->group);
+				check_all_events(ses, EVENT_FLAG_CLASS, 0, 1, "CLASS DEACTIVATED", ses->group);
+				check_all_events(ses, EVENT_FLAG_CLASS, 1, 1, "CLASS DEACTIVATED %s", ses->group, ses->group);
 
 				node = ses->list[LIST_CLASS]->list[0];
 
@@ -187,8 +230,8 @@ DO_CLASS(class_close)
 
 					show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN ACTIVATED.", node->arg1);
 
-					check_all_events(ses, SUB_ARG, 0, 1, "CLASS ACTIVATED", node->arg1);
-					check_all_events(ses, SUB_ARG, 1, 1, "CLASS ACTIVATED %s", arg1, arg1);
+					check_all_events(ses, EVENT_FLAG_CLASS, 0, 1, "CLASS ACTIVATED", node->arg1);
+					check_all_events(ses, EVENT_FLAG_CLASS, 1, 1, "CLASS ACTIVATED %s", arg1, arg1);
 				}
 				else
 				{
@@ -207,7 +250,7 @@ DO_CLASS(class_list)
 
 	if (search_node_list(ses->list[LIST_CLASS], arg1))
 	{
-		tintin_header(ses, " %s ", arg1);
+		tintin_header(ses, 80, " %s ", arg1);
 
 		for (i = 0 ; i < LIST_MAX ; i++)
 		{
@@ -248,8 +291,8 @@ DO_CLASS(class_kill)
 
 	delete_index_list(ses->list[LIST_CLASS], group);
 
-	check_all_events(ses, SUB_ARG, 0, 1, "CLASS DESTROYED", arg1);
-	check_all_events(ses, SUB_ARG, 1, 1, "CLASS DESTROYED %s", arg1, arg1);
+	check_all_events(ses, EVENT_FLAG_CLASS, 0, 1, "CLASS DESTROYED", arg1);
+	check_all_events(ses, EVENT_FLAG_CLASS, 1, 1, "CLASS DESTROYED %s", arg1, arg1);
 
 	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN KILLED.", arg1);
 
@@ -271,6 +314,9 @@ DO_CLASS(class_load)
 
 	read_file(ses, file, arg1);
 
+	check_all_events(ses, EVENT_FLAG_CLASS, 0, 1, "CLASS LOAD", arg1);
+	check_all_events(ses, EVENT_FLAG_CLASS, 1, 1, "CLASS LOAD %s", arg1, arg1);
+
 	show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN LOADED FROM MEMORY.", arg1);
 
 	return ses;
@@ -288,8 +334,8 @@ DO_CLASS(class_open)
 	{
 		if (*ses->group)
 		{
-			check_all_events(ses, SUB_ARG, 0, 1, "CLASS DEACTIVATED", ses->group);
-			check_all_events(ses, SUB_ARG, 1, 1, "CLASS DEACTIVATED %s", ses->group, ses->group);
+			check_all_events(ses, EVENT_FLAG_CLASS, 0, 1, "CLASS DEACTIVATED", ses->group);
+			check_all_events(ses, EVENT_FLAG_CLASS, 1, 1, "CLASS DEACTIVATED %s", ses->group, ses->group);
 		}
 		RESTRING(ses->group, arg1);
 
@@ -299,8 +345,8 @@ DO_CLASS(class_open)
 
 		show_message(ses, LIST_CLASS, "#CLASS {%s} HAS BEEN OPENED AND ACTIVATED.", arg1);
 
-		check_all_events(ses, SUB_ARG, 0, 1, "CLASS ACTIVATED", arg1);
-		check_all_events(ses, SUB_ARG, 1, 1, "CLASS ACTIVATED %s", arg1, arg1);
+		check_all_events(ses, EVENT_FLAG_CLASS, 0, 1, "CLASS ACTIVATED", arg1);
+		check_all_events(ses, EVENT_FLAG_CLASS, 1, 1, "CLASS ACTIVATED %s", arg1, arg1);
 	}
 
 	return ses;
@@ -311,7 +357,7 @@ DO_CLASS(class_read)
 {
 	class_open(ses, node, arg1, arg2);
 
-	execute(ses, "#READ {%s}", arg2);
+	command(ses, do_read, "{%s}", arg2);
 
 	class_close(ses, node, arg1, arg2);
 

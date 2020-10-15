@@ -207,6 +207,7 @@ extern DO_COMMAND(do_unevent);
 extern DO_COMMAND(do_unfunction);
 extern DO_COMMAND(do_ungag);
 extern DO_COMMAND(do_unhighlight);
+extern DO_COMMAND(do_unlocal);
 extern DO_COMMAND(do_unmacro);
 extern DO_COMMAND(do_unpathdir);
 extern DO_COMMAND(do_unprompt);
@@ -304,6 +305,7 @@ struct command_type command_table[] =
 	{    "unfunction",        do_unfunction,        0, TOKEN_TYPE_COMMAND },
 	{    "ungag",             do_ungag,             0, TOKEN_TYPE_COMMAND },
 	{    "unhighlight",       do_unhighlight,       0, TOKEN_TYPE_COMMAND },
+	{    "unlocal",           do_unlocal,           1, TOKEN_TYPE_COMMAND },
 	{    "unmacro",           do_unmacro,           0, TOKEN_TYPE_COMMAND },
 	{    "unpathdir",         do_unpathdir,         1, TOKEN_TYPE_COMMAND },
 	{    "unprompt",          do_unprompt,          0, TOKEN_TYPE_COMMAND },

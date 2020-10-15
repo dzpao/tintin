@@ -96,6 +96,27 @@ DO_COMMAND(do_variable)
 	return ses;
 }
 
+DO_COMMAND(do_unvariable)
+{
+	arg = sub_arg_in_braces(ses, arg, arg1, GET_ALL, SUB_VAR|SUB_FUN);
+
+	do
+	{
+		if (delete_nest_node(ses->list[LIST_VARIABLE], arg1))
+		{
+			show_message(ses, LIST_VARIABLE, "#OK. {%s} IS NO LONGER A VARIABLE.", arg1);
+		}
+		else
+		{
+			delete_node_with_wild(ses, LIST_VARIABLE, arg1);
+		}
+		arg = sub_arg_in_braces(ses, arg, arg1, GET_ALL, SUB_VAR|SUB_FUN);
+	}
+	while (*arg1);
+
+	return ses;
+}
+
 DO_COMMAND(do_local)
 {
 	char *str;
@@ -162,19 +183,41 @@ DO_COMMAND(do_local)
 	return ses;
 }
 
-DO_COMMAND(do_unvariable)
+DO_COMMAND(do_unlocal)
 {
+	struct listroot *root;
+	int index, found;
+
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ALL, SUB_VAR|SUB_FUN);
+
+	root = local_list(ses);
 
 	do
 	{
-		if (delete_nest_node(ses->list[LIST_VARIABLE], arg1))
+		if (delete_nest_node(root, arg1))
 		{
-			show_message(ses, LIST_VARIABLE, "#OK. {%s} IS NO LONGER A VARIABLE.", arg1);
+			show_message(ses, LIST_VARIABLE, "#OK. {%s} IS NO LONGER A LOCAL VARIABLE.", arg1);
 		}
 		else
 		{
-			delete_node_with_wild(ses, LIST_VARIABLE, arg1);
+			found = FALSE;
+
+			for (index = root->used - 1 ; index >= 0 ; index--)
+			{
+				if (match(ses, root->list[index]->arg1, arg1, SUB_VAR|SUB_FUN))
+				{
+					show_message(ses, LIST_VARIABLE, "#OK. {%s} IS NO LONGER A LOCAL VARIABLE.", root->list[index]->arg1);
+
+					delete_index_list(root, index);
+
+					found = TRUE;
+				}
+			}
+
+			if (found == 0)
+			{
+				show_message(ses, LIST_VARIABLE, "#UNLOCAL: NO MATCHES FOUND FOR {%s}.", arg1);
+			}
 		}
 		arg = sub_arg_in_braces(ses, arg, arg1, GET_ALL, SUB_VAR|SUB_FUN);
 	}

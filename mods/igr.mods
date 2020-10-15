@@ -1,6 +1,8 @@
 Oct 2020        2.02.05
 ------------------------------------------------------------------------------
 
+variables.c     Added the #unlocal command.
+
 files.c         Table variables are now written to file with indentation.
 
 utf8.c          Decreased the memory footprint of BIG-5 / GBK-1 support.

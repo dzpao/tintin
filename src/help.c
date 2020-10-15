@@ -2541,7 +2541,9 @@ struct help_type help_table[] =
 		"\n"
 		"         Avoid setting the result variable as local in a function.\n"
 		"\n"
-		"<178>Example<278>: #alias {swap} {#local x %0;#replace x {e} {u};#show $x}\n",
+		"<178>Example<278>: #alias {swap} {#local x %0;#replace x {e} {u};#show $x}\n"
+		"\n"
+		"<178>Comment<278>: You can remove a local variable with the #unlocal command.\n",
 
 		"format function math replace script variable"
 	},

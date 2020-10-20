@@ -2134,7 +2134,12 @@ void destroy_screen()
 
 void print_scroll_region(struct session *ses)
 {
-	int cnt;
+	char *wrap;
+	int cnt, height, width;
+
+	push_call("print_scroll_region(%p)",ses);
+
+	wrap = str_alloc_stack(0);
 
 	save_pos(ses);
 
@@ -2142,9 +2147,15 @@ void print_scroll_region(struct session *ses)
 	{
 		print_stdout(0, 0, "\e[%d;%dH\e[%dX%s", cnt, ses->split->top_col, ses->wrap, gtd->screen->line[cnt - 1]->str);
 	}
-	print_stdout(0, 0, "\e[%d;%dH\e[%dX%s", cnt, ses->split->top_col, ses->wrap, ses->scroll->input);
+
+	word_wrap_split(ses, ses->scroll->input, wrap, ses->wrap, 0, 1, WRAP_FLAG_SPLIT, &height, &width);
+
+	print_stdout(0, 0, "\e[%d;%dH\e[%dX%s", cnt, ses->split->top_col, ses->wrap, wrap);
 
 	restore_pos(ses);
+
+	pop_call();
+	return;
 }
 
 void print_screen()

@@ -138,7 +138,11 @@ DO_COMMAND(do_list)
 			{
 				node = set_nest_node_ses(ses, arg1, "");
 			}
+			push_call_printf("list: %s, %s", array_table[cnt].name, arg);
+
 			array_table[cnt].fun(ses, node, arg, arg1, arg2, arg3);
+
+			pop_call();
 		}
 	}
 	return ses;
@@ -268,7 +272,14 @@ DO_ARRAY(array_delete)
 		arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 		arg = get_arg_in_braces(ses, arg, arg2, GET_ALL);
 
-		loop = *arg2 ? (int) get_number(ses, arg2) : 1;
+		if (*arg2)
+		{
+			loop = URANGE(1, (int) get_number(ses, arg2), list->root->used);
+		}
+		else
+		{
+			loop = 1;
+		}
 
 		while (loop--)
 		{
@@ -353,89 +364,31 @@ DO_ARRAY(array_explode)
 
 DO_ARRAY(array_find)
 {
-	char *arg3;
-	int cnt, index;
-
-	arg3 = str_alloc_stack(0);
+	int index;
 
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 	arg = sub_arg_in_braces(ses, arg, arg2, GET_ONE, SUB_VAR|SUB_FUN);
-	arg = sub_arg_in_braces(ses, arg, arg3, GET_ALL, SUB_VAR|SUB_FUN);
 
 	if (*arg2 == 0)
 	{
-		show_error(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} FIND [nest] {string} {variable}");
+		show_error(ses, LIST_VARIABLE, "#SYNTAX: #LIST {variable} FIND {string} {variable}");
 
 		return ses;
 	}
 
 	if (list->root)
 	{
-		if (*arg3 == 0)
+		for (index = 0 ; index < list->root->used ; index++)
 		{
-			for (index = 0 ; index < list->root->used ; index++)
-			{
-				if (match(ses, list->root->list[index]->arg2, arg1, SUB_NONE))
-				{
-					break;
-				}
-			}
-			if (index < list->root->used)
+			if (match(ses, list->root->list[index]->arg2, arg1, SUB_NONE))
 			{
 				set_nest_node_ses(ses, arg2, "%d", index + 1);
-			}
-			else
-			{
-				set_nest_node_ses(ses, arg2, "0");
-			}
-			return ses;
-		}
-		else
-		{
-			if (list->root->list[0]->root == NULL)
-			{
-				show_error(ses, LIST_COMMAND, "#ERROR: #LIST {%s} FIND: NOT AN INDEXABLE LIST TABLE.");
-		
+
 				return ses;
 			}
-		
-			if (list->root->used > 1)
-			{
-				int index = search_index_list(list->root->list[0]->root, arg1, "");
-		
-				if (index == -1)
-				{
-					show_error(ses, LIST_COMMAND, "#ERROR: #LIST {%s} FIND {%s}: FAILED TO FIND NEST.", var, arg1);
-		
-					return ses;
-				}
-		
-				for (cnt = 0 ; cnt < list->root->used ; cnt++)
-				{
-					if (list->root->list[cnt]->root && list->root->list[cnt]->root->used > index)
-					{
-						if (match(ses, list->root->list[cnt]->root->list[index]->arg2, arg2, SUB_NONE))
-						{
-							break;
-						}
-					}
-				}
-
-				if (cnt < list->root->used)
-				{
-					set_nest_node_ses(ses, arg3, "%d", cnt + 1);
-				}
-				else
-				{
-					set_nest_node_ses(ses, arg3, "%d", 0);
-				}
-			}
 		}
 	}
-	else
-	{
-		set_nest_node_ses(ses, arg2, "0");
-	}
+	set_nest_node_ses(ses, arg2, "0");
 
 	return ses;
 }

@@ -521,6 +521,8 @@ void init_tintin(int greeting)
 	gts->lognext_name   = strdup("");
 	gts->logline_name   = strdup("");
 
+	gts->more_output    = str_dup("");
+
 	gtd->ses = gts;
 
 	for (index = 0 ; index < LIST_MAX ; index++)

@@ -1,14 +1,14 @@
 * BUGS
 
-  - save tables with spacing
+  - See about making #var test @bla work.
 
-  - change big-5 / gbk-1 lookup tables to unsigned short decimal arrays
+  - proper negative index handling for #list
+
+  - See about turning window close into a program termination event.
 
   - finish BUFFER_SIZE replacement.
 
   - WSL faq: #system cmd.exe /c start notepad
-
-  - str_ify ses->more_output
 
   - update msdp scripts with #line msdp feature
 

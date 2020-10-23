@@ -1020,7 +1020,6 @@ struct event_type event_table[] =
 	{    "PRESSED ",                               0, EVENT_FLAG_MOUSE,    "MOUSE",     "mouse button is pressed"    },
 	{    "PROCESSED KEYPRESS",                     0, EVENT_FLAG_INPUT,    "INPUT",     "after a regular keypress"   },
 	{    "PROGRAM START",                          0, EVENT_FLAG_SYSTEM,   "SYSTEM",    "main session starts"        },
-
 	{    "PROGRAM TERMINATION",                    0, EVENT_FLAG_SYSTEM,   "SYSTEM",    "main session exists"        },
 	{    "READ ERROR",                             0, EVENT_FLAG_SYSTEM,   "SYSTEM",    "the read command fails"     },
 	{    "RECEIVED ERROR",                         0, EVENT_FLAG_SYSTEM,   "SYSTEM",    "an error is received"       },

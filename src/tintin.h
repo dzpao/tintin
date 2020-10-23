@@ -595,13 +595,13 @@ enum operators
 #define TINTIN_FLAG_INHERITANCE       BV04
 #define TINTIN_FLAG_INSERTINPUT       BV05
 #define TINTIN_FLAG_CHILDLOCK         BV06
-#define TINTIN_FLAG_TERMINATE         BV06
-#define TINTIN_FLAG_MOUSETRACKING     BV07
-#define TINTIN_FLAG_DISPLAYUPDATE     BV08
-#define TINTIN_FLAG_DAEMONIZE         BV09
-#define TINTIN_FLAG_HIDDENCURSOR      BV10
-#define TINTIN_FLAG_LOCAL             BV11
-#define TINTIN_FLAG_PRESERVEMACRO     BV12
+#define TINTIN_FLAG_TERMINATE         BV07
+#define TINTIN_FLAG_MOUSETRACKING     BV08
+#define TINTIN_FLAG_DISPLAYUPDATE     BV09
+#define TINTIN_FLAG_DAEMONIZE         BV10
+#define TINTIN_FLAG_HIDDENCURSOR      BV11
+#define TINTIN_FLAG_LOCAL             BV12
+#define TINTIN_FLAG_PRESERVEMACRO     BV13
 
 
 #define CONFIG_FLAG_AUTOPATCH         BV01
@@ -996,7 +996,7 @@ enum operators
 
 #define SCROLL(ses)               ((ses)->cur_row == 0 || ((ses)->cur_row >= (ses)->split->top_row && (ses)->cur_row <= (ses)->split->bot_row) || ((ses)->cur_row >= ses->input->top_row && (ses)->cur_row <= ses->input->bot_row))
 
-#define VERBATIM(ses)             (gtd->level->verbatim || (gtd->level->input == 0 && HAS_BIT((ses)->config_flags, CONFIG_FLAG_VERBATIM)) || HAS_BIT(gtd->flags, TINTIN_FLAG_CHILDLOCK))
+#define VERBATIM(ses)             (gtd->level->verbatim || (gtd->level->input == 0 && (HAS_BIT((ses)->config_flags, CONFIG_FLAG_VERBATIM) || HAS_BIT(gtd->flags, TINTIN_FLAG_CHILDLOCK))))
 
 
 
@@ -1183,7 +1183,8 @@ struct session
 	int                     read_max;
 	unsigned long long      connect_retry;
 	int                     connect_error;
-	char                    more_output[BUFFER_SIZE];
+//	char                    more_output[BUFFER_SIZE];
+	char                  * more_output;
 	int                     color;
 	char                    color_patch[100];
 	unsigned long long      packet_patch;

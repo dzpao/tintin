@@ -138,14 +138,36 @@ DO_COMMAND(do_list)
 			{
 				node = set_nest_node_ses(ses, arg1, "");
 			}
-			push_call_printf("list: %s, %s", array_table[cnt].name, arg);
-
 			array_table[cnt].fun(ses, node, arg, arg1, arg2, arg3);
-
-			pop_call();
 		}
 	}
 	return ses;
+}
+
+int get_list_index(struct session *ses, struct listroot *root, char *arg)
+{
+	int toi;
+
+	toi = get_number(ses, arg);
+
+	if (toi > 0)
+	{
+		if (toi <= root->used)
+		{
+			return toi - 1;
+		}
+		return -1;
+	}
+
+	if (toi < 0)
+	{
+		if (root->used + toi >= 0)
+		{
+			return root->used + toi;
+		}
+		return -1;
+	}
+	return -1;
 }
 
 DO_ARRAY(array_add)
@@ -272,31 +294,31 @@ DO_ARRAY(array_delete)
 		arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 		arg = get_arg_in_braces(ses, arg, arg2, GET_ALL);
 
+		index = get_list_index(ses, list->root, arg1);
+
 		if (*arg2)
 		{
-			loop = URANGE(1, (int) get_number(ses, arg2), list->root->used);
+			loop = URANGE(1, (int) get_number(ses, arg2), list->root->used - index);
 		}
 		else
 		{
 			loop = 1;
 		}
 
+		if (index == -1)
+		{
+			show_error(ses, LIST_VARIABLE, "#LIST {%s} DEL: Invalid index: %s", var, arg1);
+
+			return ses;
+		}
+
+		for (cnt = index + loop ; cnt < list->root->used ; cnt++)
+		{
+			str_cpy_printf(&list->root->list[cnt]->arg1, "%d", cnt + 1 - loop);
+		}
+
 		while (loop--)
 		{
-			index = search_nest_index(list->root, arg1);
-
-			if (atoi(arg1) == 0 || index == -1)
-			{
-				show_error(ses, LIST_VARIABLE, "#LIST DEL: Invalid index: %s", arg1);
-
-				return ses;
-			}
-
-			for (cnt = index + 1 ; cnt < list->root->used ; cnt++)
-			{
-				str_cpy_printf(&list->root->list[cnt]->arg1, "%d", cnt);
-			}
-
 			delete_index_list(list->root, index);
 		}
 	}
@@ -396,6 +418,8 @@ DO_ARRAY(array_find)
 
 DO_ARRAY(array_get)
 {
+	int index;
+
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 	arg = sub_arg_in_braces(ses, arg, arg2, GET_ALL, SUB_VAR|SUB_FUN);
 
@@ -408,22 +432,16 @@ DO_ARRAY(array_get)
 
 	if (list->root)
 	{
-		int index = search_nest_index(list->root, arg1);
+		index = get_list_index(ses, list->root, arg1);
 
-		if (atoi(arg1) == 0 || index == -1)
-		{
-			set_nest_node_ses(ses, arg2, "0");
-		}
-		else
+		if (index != -1)
 		{
 			set_nest_node_ses(ses, arg2, "%s", list->root->list[index]->arg2);
+
+			return ses;
 		}
-		return ses;
 	}
-	else
-	{
-		set_nest_node_ses(ses, arg2, "0");
-	}
+	set_nest_node_ses(ses, arg2, "0");
 
 	return ses;
 }
@@ -470,7 +488,7 @@ DO_ARRAY(array_index)
 
 DO_ARRAY(array_insert)
 {
-	int cnt, index;
+	int cnt, toi, index;
 
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 	arg = sub_arg_in_braces(ses, arg, arg2, GET_ALL, SUB_VAR|SUB_FUN);
@@ -480,16 +498,18 @@ DO_ARRAY(array_insert)
 		list->root = init_list(ses, LIST_VARIABLE, LIST_SIZE);
 	}
 
-	index = search_nest_index(list->root, arg1);
+	toi = get_number(ses, arg1);
 
-	if (atoi(arg1) == 0)
+	if (toi == 0)
 	{
 		show_error(ses, LIST_VARIABLE, "#LIST INS: Invalid index: %s", arg1);
-		
+
 		return ses;
 	}
 
-	if (index == -1 || atoi(arg1) < 0)
+	index = get_list_index(ses, list->root, arg1);
+
+	if (index == -1 || toi < 0)
 	{
 		index++;
 	}
@@ -654,22 +674,21 @@ DO_ARRAY(array_size)
 
 DO_ARRAY(array_set)
 {
+	int index;
+
 	arg = sub_arg_in_braces(ses, arg, arg1, GET_ONE, SUB_VAR|SUB_FUN);
 	arg = sub_arg_in_braces(ses, arg, arg2, GET_ALL, SUB_VAR|SUB_FUN);
 
 	if (list->root)
 	{
-		int index = search_nest_index(list->root, arg1);
+		index = get_list_index(ses, list->root, arg1);
 
-		if (atoi(arg1) == 0 || index == -1)
+		if (index == -1)
 		{
-			show_error(ses, LIST_VARIABLE, "#LIST SET: Invalid index: %s", arg1);
-			
+			show_error(ses, LIST_VARIABLE, "#LIST {%s} SET: Invalid index: %s", var, arg1);
+
 			return ses;
 		}
-
-//		set_nest_node(list->root, ntos(index + 1), "%s", arg2);
-
 		str_cpy(&list->root->list[index]->arg2, arg2);
 
 		return ses;

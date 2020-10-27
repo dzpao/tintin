@@ -69,7 +69,7 @@ struct array_type array_table[] =
 	{     "FIND",             array_find,        "Find a list item with given regex"       },
 	{     "FND",              array_find,        NULL                                      },
 	{     "GET",              array_get,         "Retrieve a list item with given index"   },
-	{     "INDEX",            array_index,       "Index a list table for sorting"          },
+	{     "INDEXATE",         array_index,       "Indexate a list table for sorting"       },
 	{     "INSERT",           array_insert,      "Insert a list item at given index"       },
 	{     "ORDER",            array_order,       "Sort a list table numerically"           },
 	{     "LENGTH",           array_size,        NULL                                      },

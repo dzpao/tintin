@@ -2221,7 +2221,7 @@ struct help_type help_table[] =
 		"         #list {var} {delete} {index} {number}  Delete the item at {index},\n"
 		"                                                the {number} is optional.\n"
 		"         #list {var} {explode}                  Turn list into a character list\n"
-		"         #list {var} {index}                    Index a list table for sorting\n"
+		"         #list {var} {indexate}                 Index a list table for sorting\n"
 		"         #list {var} {insert} {index} {string}  Insert {string} at given index\n"
 		"         #list {var} {find} {string} {variable} Return the found index\n"
 		"         #list {var} {get} {index} {variable}   Copy an item to {variable}\n"

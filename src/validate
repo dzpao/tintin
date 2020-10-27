@@ -252,6 +252,19 @@ $bla + 1
 #if {$bla[1][bli] != 2} {error 28.1: 2D list handling}
 #list bla reverse
 #if {$bla[1][bli] != 3} {error 28.2: 2D list handling}
+#var bla[1][blo] 4
+#list bla[1] get 1 tmp
+#if {$tmp != 3} {error 28.3: 2D list handling: $tmp}
+#list bla[1] get -1 tmp
+#if {$tmp != 4} {error 28.4: 2D list handling: $tmp}
+#list bla[1] find {4} tmp
+#if {$tmp != 2} {error 28.5: 2D list handling: $tmp}
+#list bla[1] set 2 5
+#list bla[1] find {5} tmp
+#if {$tmp != 2} {error 28.6: 2D list handling: $tmp}
+#list bla[1] insert 2 9
+#list bla[1] get 2 tmp
+#if {$tmp != 9} {error 28.7: 2D list handling: $tmp}
 
 #nop ----------
 

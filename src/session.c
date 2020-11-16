@@ -310,6 +310,8 @@ struct session *activate_session(struct session *ses)
 
 	if (!check_all_events(ses, EVENT_FLAG_GAG, 0, 1, "GAG SESSION ACTIVATED", ses->name))
 	{
+//		buffer_refresh(ses, "", "", "");
+
 		show_message(ses, LIST_COMMAND, "#SESSION '%s' ACTIVATED.", ses->name);
 	}
 

@@ -182,104 +182,47 @@ DO_CONFIG(config_charset)
 				DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
 			}
 		}
-		else if (is_abbrev(arg2, "ASCII"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-		}
-		else if (is_abbrev(arg2, "BIG-5"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_BIG5);
-		}
-		else if (is_abbrev(arg2, "GBK-1"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_GBK1);
-		}
-		else if (is_abbrev(arg2, "UTF-8"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_UTF8);
-		}
-		else if (is_abbrev(arg2, "BIG5TOUTF8") || is_abbrev(arg2, "BIG2UTF"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_UTF8|CHARSET_FLAG_BIG5TOUTF8);
-		}
-		else if (is_abbrev(arg2, "CP1251TOUTF8"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_UTF8|CHARSET_FLAG_CP1251TOUTF8);
-		}
-		else if (is_abbrev(arg2, "FANSI"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_UTF8|CHARSET_FLAG_FANSITOUTF8);
-		}
-		else if (is_abbrev(arg2, "GBK1TOUTF8"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_UTF8|CHARSET_FLAG_GBK1TOUTF8);
-		}
-		else if (is_abbrev(arg2, "ISO1TOUTF8"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_UTF8|CHARSET_FLAG_ISO1TOUTF8);
-		}
-		else if (is_abbrev(arg2, "ISO2TOUTF8"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_UTF8|CHARSET_FLAG_ISO2TOUTF8);
-		}
-		else if (is_abbrev(arg2, "KOI8TOUTF8"))
-		{
-			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
-			SET_BIT(ses->charset, CHARSET_FLAG_UTF8|CHARSET_FLAG_KOI8TOUTF8);
-		}
 		else
 		{
-			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} <AUTO|ASCII|BIG-5|BIG5TOUTF8|CP1251TOUTF8|FANSI|GBK-1|GBK1TOUTF8|ISO1TOUTF8|ISO2TOUTF8|KOI8TOUTF8|UTF-8>", config_table[index].name);
+			for (index = 0 ; *charset_table[index].name ; index++)
+			{
+				if (is_abbrev(arg2, charset_table[index].name))
+				{
+					break;
+				}
+			}
+
+			if (*charset_table[index].name == 0)
+			{
+				show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {CHARSET} <AUTO|ASCII|BIG-5|BIG5TOUTF8|CP1251TOUTF8|CP949|CP949TOUTF8|FANSI|GBK-1|GBK1TOUTF8|ISO1TOUTF8|ISO2TOUTF8|KOI8TOUTF8|UTF-8>");
+
+				return NULL;
+			}
+
+			DEL_BIT(ses->charset, CHARSET_FLAG_ALL);
+
+			SET_BIT(ses->charset, charset_table[index].flags);
+		}
+	}
+	else
+	{
+		for (index = 0 ; *charset_table[index].name ; index++)
+		{
+			if (ses->charset == charset_table[index].flags)
+			{
+				break;
+			}
+		}
+
+		if (*charset_table[index].name == 0)
+		{
+			show_error(ses, LIST_CONFIG, "#CONFIG CHARSET: INVALID FLAG: %d", ses->charset);
 
 			return NULL;
 		}
 	}
 
-	switch (HAS_BIT(ses->charset, CHARSET_FLAG_ALL))
-	{
-		case CHARSET_FLAG_BIG5:
-			strcpy(arg2, "BIG-5");
-			break;
-		case CHARSET_FLAG_GBK1:
-			strcpy(arg2, "GBK-1");
-			break;
-		case CHARSET_FLAG_UTF8:
-			strcpy(arg2, "UTF-8");
-			break;
-		case CHARSET_FLAG_UTF8|CHARSET_FLAG_BIG5TOUTF8:
-			strcpy(arg2, "BIG5TOUTF8");
-			break;
-	        case CHARSET_FLAG_UTF8|CHARSET_FLAG_CP1251TOUTF8:
-	        	strcpy(arg2, "CP1251TOUTF8");
-	        	break;
-		case CHARSET_FLAG_UTF8|CHARSET_FLAG_FANSITOUTF8:
-			strcpy(arg2, "FANSI");
-			break;
-		case CHARSET_FLAG_UTF8|CHARSET_FLAG_GBK1TOUTF8:
-			strcpy(arg2, "GBK1TOUTF8");
-			break;
-		case CHARSET_FLAG_UTF8|CHARSET_FLAG_KOI8TOUTF8:
-			strcpy(arg2, "KOI8TOUTF8");
-			break;
-		case CHARSET_FLAG_UTF8|CHARSET_FLAG_ISO1TOUTF8:
-			strcpy(arg2, "ISO1TOUTF8");
-			break;
-		case CHARSET_FLAG_UTF8|CHARSET_FLAG_ISO2TOUTF8:
-			strcpy(arg2, "ISO2TOUTF8");
-			break;
-		default:
-			strcpy(arg2, "ASCII");
-			break;
-	}
+	strcpy(arg2, charset_table[index].name);
 
 	return ses;
 }

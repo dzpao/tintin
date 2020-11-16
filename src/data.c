@@ -491,38 +491,38 @@ int locate_index_list(struct listroot *root, char *text, char *priority)
 
 int bsearch_alpha_list(struct listroot *root, char *text, int seek)
 {
-	int bot, top, val, srt;
+        int bot, top, val, srt;
 
-	bot = 0;
-	top = root->used - 1;
-	val = top;
+        bot = 0;
+        top = root->used - 1;
+        val = top;
 
-	while (bot <= top)
-	{
-		srt = strcmp(text, root->list[val]->arg1);
+        while (bot <= top)
+        {
+                srt = strcmp(text, root->list[val]->arg1);
 
-		if (srt == 0)
-		{
-			return val;
-		}
+                if (srt == 0)
+                {
+                        return val;
+                }
 
-		if (srt < 0)
-		{
-			top = val - 1;
-		}
-		else
-		{
-			bot = val + 1;
-		}
+                if (srt < 0)
+                {
+                        top = val - 1;
+                }
+                else
+                {
+                        bot = val + 1;
+                }
 
-		val = bot + (top - bot) / 2;
-	}
+                val = bot + (top - bot) / 2;
+        }
 
-	if (seek)
-	{
-		return UMAX(0, val);
-	}
-	return -1;
+        if (seek)
+        {
+                return UMAX(0, val);
+        }
+        return -1;
 }
 
 

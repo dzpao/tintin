@@ -1134,7 +1134,7 @@ void time_update(void)
 		}
 		event_time = event_second;
 
-		while (!strcmp(event_table[event_time].name, "TIME"))
+		while (strcmp(event_table[++event_time].name, "TIME "))
 		{
 		}
 	}

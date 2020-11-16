@@ -516,8 +516,8 @@ int check_key(char *input, int len)
 
 					gtd->screen->focus = 1;
 					
-					check_all_events(gtd->ses, EVENT_FLAG_SCREEN, 0, 1, "SCREEN FOCUS", ntos(gtd->screen->focus));
-					
+					check_all_events(gtd->ses, EVENT_FLAG_MOUSE, 0, 1, "SCREEN FOCUS", ntos(gtd->screen->focus));
+
 					msdp_update_all("SCREEN_FOCUS", "%d", gtd->screen->focus);
 					
 					pop_call();

@@ -1363,7 +1363,8 @@ unsigned long long tintou(char *str)
 				break;
 
 			case '.':
-				*ptr = 0;
+				value = 0;
+				m = 1;
 				break;
 
 			case ':':

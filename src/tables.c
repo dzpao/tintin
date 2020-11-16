@@ -69,6 +69,24 @@ struct substitution_type substitution_table[] =
 	{    "",                     0       }
 };
 
+struct charset_type charset_table[] =
+{
+	{    "ASCII",         "iso-8859-1",  0                 },
+	{    "UTF-8",         "utf-8",       CHARSET_FLAG_UTF8 },
+	{    "GBK-1",         "gb18030",     CHARSET_FLAG_GBK1 },
+	{    "CP949",         "cp949",       CHARSET_FLAG_CP949 },
+
+	{    "BIG5TOUTF8",    "utf-8",       CHARSET_FLAG_UTF8|CHARSET_FLAG_BIG5TOUTF8 },
+	{    "CP1251TOUTF8",  "utf-8",       CHARSET_FLAG_UTF8|CHARSET_FLAG_CP1251TOUTF8 },
+	{    "CP949TOUTF8",   "utf-8",       CHARSET_FLAG_UTF8|CHARSET_FLAG_CP949TOUTF8 },
+	{    "FANSITOUTF8",   "utf-8",       CHARSET_FLAG_UTF8|CHARSET_FLAG_FANSITOUTF8 },
+	{    "GBK1TOUTF8",    "utf-8",       CHARSET_FLAG_UTF8|CHARSET_FLAG_GBK1TOUTF8 },
+	{    "ISO1TOUTF8",    "utf-8",       CHARSET_FLAG_UTF8|CHARSET_FLAG_ISO1TOUTF8 },
+	{    "ISO2TOUTF8",    "utf-8",       CHARSET_FLAG_UTF8|CHARSET_FLAG_ISO2TOUTF8 },
+	{    "KOI8TOUTF8",    "utf-8",       CHARSET_FLAG_UTF8|CHARSET_FLAG_KOI8TOUTF8 },
+	{    "",              "",            0 }
+};
+
 struct config_type config_table[] =
 {
 	{
@@ -1067,7 +1085,7 @@ struct event_type event_table[] =
 	{    "SWIPED",                                 0, EVENT_FLAG_MOUSE,    "MOUSE",     "mouse swipe"                },
 	{    "SYSTEM CRASH",                           0, EVENT_FLAG_SYSTEM,   "SYSTEM",    "system crash"               },
 	{    "SYSTEM ERROR",                           0, EVENT_FLAG_SYSTEM,   "SYSTEM",    "system errors"              },
-	{    "TIME",                                   0, EVENT_FLAG_TIME,     "TIME",      "the given time"             },
+	{    "TIME ",                                  0, EVENT_FLAG_TIME,     "TIME",      "the given time"             },
 	{    "TRIPLE-CLICKED",                         0, EVENT_FLAG_MOUSE,    "MOUSE",     "mouse is triple-clicked"    },
 	{    "UNKNOWN COMMAND",                        0, EVENT_FLAG_SYSTEM,   "SYSTEM",    "unknown tintin command"     },
 	{    "VARIABLE UPDATE ",                       0, EVENT_FLAG_VARIABLE, "VARIABLE",  "before a variable updates"  },

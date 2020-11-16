@@ -13,18 +13,13 @@
 #nop ----------
 
 #math tmp 1 + 1
-
-#if {$tmp != 2}
-{
-	error 1: math failure
-}
+#if {$tmp != 2}{error 1: math failure}
 
 #math tmp 7 / 11 * 100.00
+#if {"$tmp" != "63.64"} {error 1.1: math failure}
 
-#if {"$tmp" != "63.64"}
-{
-	error 1.1: math failure
-}
+#math tmp (1 + 1) % 10
+#if {$tmp != 2} {error 1.2: math failure}
 
 #nop ----------
 
@@ -45,10 +40,10 @@
 
 #buf get tmp -3 -1
 
-#if {&tmp[] != 2}
-{
-	error 4: buffer or variable or if failure ($tmp)
-}
+#if {&tmp[] != 2} error 4.1: buffer or variable or if failure ($tmp)
+#if {&tmp[%*] != 2} error 4.2: buffer or variable or if failure ($tmp)
+#if {&{tmp[]} != 2} error 4.3: buffer or variable or if failure ($tmp)
+#if {&{tmp[%*]} != 2} error 4.4: buffer or variable or if failure ($tmp)
 
 #nop ----------
 

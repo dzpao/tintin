@@ -1,8 +1,25 @@
 * BUGS
 
-  - See about making #var test @bla work.
+  - make sure lists with {} data can be indexed
 
-  - proper negative index handling for #list
+  - add support for list filtering
+
+  - possible wordwrapping on raw string length instead of stripped length
+    in some edge case.
+
+  - look into using fmod for % in #math
+
+  - Make SCREEN FOCUS work out of the box
+
+  - Look into WSL sound handling
+
+  - Look into clearing the alternate scroll buffer on split.
+
+  - CP949.TXT full table support
+
+  - Look into escaped color codes in zmp, possibly msdp
+
+  - See about making @$var{} work.
 
   - See about turning window close into a program termination event.
 

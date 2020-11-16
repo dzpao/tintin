@@ -1387,6 +1387,9 @@ struct help_type help_table[] =
 		"         <278>  Mouse events can be prefixed with MAP to only trigger when the mouse\n"
 		"         <278>  event occurs inside the VT100 map region.\n"
 		"\n"
+		"         <178>SCREEN FOCUS\n"
+		"         <278>  %0 focus (0 or 1)\n"
+		"\n"
 		"         <178>SWIPED [DIR]\n"
 		"         <278>  %0 dir  %1 button  %2 row  %3 col  %4 -row  %5 -col\n"
 		"         <278>                     %6 row  %7 col  %8 -row  %9 -col %10 rows %11 cols\n"
@@ -1457,7 +1460,7 @@ struct help_type help_table[] =
 		"\n"
 		"         <128>SCREEN EVENTS<278>\n"
 		"\n"
-		"         SCREEN FOCUS           %0 focus (0 or 1)\n"
+
 		"         SCREEN LOCATION        %0 rows %1 cols  %2 height %3 width\n"
 		"\n"
 		"         <178>SCREEN MOUSE LOCATION\n"

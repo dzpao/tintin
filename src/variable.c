@@ -1080,7 +1080,7 @@ int string_raw_str_len(struct session *ses, char *str, int raw_start, int raw_en
 		}
 
 		col_len = is_color_code(&str[raw_cnt]);
-		
+
 		if (col_len)
 		{
 			raw_cnt += col_len;
@@ -1104,7 +1104,7 @@ int string_raw_str_len(struct session *ses, char *str, int raw_start, int raw_en
 			continue;
 		}
 
-		if (HAS_BIT(ses->charset, CHARSET_FLAG_EUC)  && is_euc_head(ses, &str[raw_cnt]))
+		if (HAS_BIT(ses->charset, CHARSET_FLAG_EUC) && is_euc_head(ses, &str[raw_cnt]))
 		{
 			raw_cnt += get_euc_width(ses, &str[raw_cnt], &width);
 

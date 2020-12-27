@@ -259,6 +259,11 @@ DO_CONFIG(config_colormode)
 		{
 			ses->color = 0;
 		}
+		else if (is_abbrev(arg2, "REVERSE"))
+		{
+			ses->color = 0;
+			printf("\e[30m");
+		}
 		else if (is_abbrev(arg2, "ANSI"))
 		{
 			ses->color = 16;
@@ -560,14 +565,14 @@ DO_CONFIG(config_mousetracking)
 		DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS);
 		DEL_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
 
-		if (is_member(arg2, "INFO"))
-		{
-			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
-			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
-		}
 		if (is_member(arg2, "DEBUG"))
 		{
 			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
+			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
+		}
+		if (is_member(arg2, "INFO"))
+		{
+			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
 			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
 		}
 		if (is_member(arg2, "ON"))
@@ -582,14 +587,7 @@ DO_CONFIG(config_mousetracking)
 
 		if (is_abbrev(arg2, "OFF"))
 		{
-			if (HAS_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING))
-			{
-				DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
-				DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
-				DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS);
-				DEL_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
-				print_stdout(0, 0, "\e[?1000l\e[?1002l\e[?1004l\e[?1006l\e[?1016l");
-			}
+			print_stdout(0, 0, "\e[?1000l\e[?1002l\e[?1006l\e[?1016l");
 		}
 		else
 		{
@@ -597,11 +595,11 @@ DO_CONFIG(config_mousetracking)
 			{
 				if (HAS_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS))
 				{
-					print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1004h\e[?1016h");
+					print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1016h");
 				}
 				else
 				{
-					print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1004h\e[?1006h");
+					print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1006h");
 				}
 			}
 			else
@@ -611,63 +609,6 @@ DO_CONFIG(config_mousetracking)
 				return NULL;
 			}
 		}
-/*
-		if (is_abbrev(arg2, "ON"))
-		{
-			DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
-			DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
-			DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS);
-			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
-			print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1004h\e[?1006h");
-		}
-		else if (is_abbrev(arg2, "PIXELS"))
-		{
-			DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
-			DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
-			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS);
-			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
-		
-			print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1004h\e[?1016h");
-		}
-		else if (is_abbrev(arg2, "OFF"))
-		{
-			if (HAS_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING))
-			{
-				DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
-				DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
-				DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEPIXELS);
-				DEL_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
-				print_stdout(0, 0, "\e[?1000l\e[?1002l\e[?1004l\e[?1006l");
-			}
-		}
-		else if (is_abbrev(arg2, "DEBUG"))
-		{
-			DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
-			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
-			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
-			print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1004h\e[?1006h");
-		}
-		else if (is_abbrev(arg2, "DEBUG INFO"))
-		{
-			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
-			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
-			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
-			print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1004h\e[?1006h");
-		}
-		else if (is_abbrev(arg2, "INFO"))
-		{
-			DEL_BIT(ses->config_flags, CONFIG_FLAG_MOUSEDEBUG);
-			SET_BIT(ses->config_flags, CONFIG_FLAG_MOUSEINFO);
-			SET_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING);
-			print_stdout(0, 0, "\e[?1000h\e[?1002h\e[?1004h\e[?1006h");
-		}
-		else
-		{
-			show_error(ses, LIST_CONFIG, "#SYNTAX: #CONFIG {%s} <ON|OFF|DEBUG|INFO|DEBUG INFO>", config_table[index].name);
-
-			return NULL;
-		}
-*/
 	}
 
 	if (HAS_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING))

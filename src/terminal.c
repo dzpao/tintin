@@ -80,7 +80,7 @@ void init_terminal(struct session *ses)
 		syserr_fatal(-1, "init_terminal: tcgetattr 2");
 	}
 
-	print_stdout(0, 0, "\e=\e[>4;1m");
+	print_stdout(0, 0, "\e[?1004h\e=\e[>4;1m");
 }
 
 void reset_terminal(struct session *ses)
@@ -95,9 +95,9 @@ void reset_terminal(struct session *ses)
 
 	if (HAS_BIT(gtd->flags, TINTIN_FLAG_MOUSETRACKING))
 	{
-		print_stdout(0, 0, "\e[?1000l\e[?1002l\e[?1004l\e[?1006l");
+		print_stdout(0, 0, "\e[?1000l\e[?1002l\e[?1006l");
 	}
-	print_stdout(0, 0, "\e[?25h\e[23t\e[>4n\e[?47l\e[r\e[0#t");
+	print_stdout(0, 0, "\e[?25h\e[23t\e[?1004l\e[>4n\e[?47l\e[r\e[0#t");
 }
 
 

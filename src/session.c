@@ -302,20 +302,18 @@ struct session *newactive_session(void)
 
 struct session *activate_session(struct session *ses)
 {
-	check_all_events(gtd->ses, EVENT_FLAG_SESSION, 0, 1, "SESSION DEACTIVATED", gtd->ses->name);
-
-	gtd->ses = ses;
+	check_all_events(gtd->ses, EVENT_FLAG_SESSION, 0, 2, "SESSION DEACTIVATED", gtd->ses->name, ses->name);
 
 	dirty_screen(ses);
 
-	if (!check_all_events(ses, EVENT_FLAG_GAG, 0, 1, "GAG SESSION ACTIVATED", ses->name))
+	if (!check_all_events(ses, EVENT_FLAG_GAG, 0, 2, "GAG SESSION ACTIVATED", ses->name, gtd->ses->name))
 	{
-//		buffer_refresh(ses, "", "", "");
-
 		show_message(ses, LIST_COMMAND, "#SESSION '%s' ACTIVATED.", ses->name);
 	}
 
-	check_all_events(ses, EVENT_FLAG_SESSION, 0, 1, "SESSION ACTIVATED", ses->name);
+	check_all_events(ses, EVENT_FLAG_SESSION, 0, 2, "SESSION ACTIVATED", ses->name, gtd->ses->name);
+
+	gtd->ses = ses;
 
 	return ses;
 }

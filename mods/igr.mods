@@ -1,6 +1,21 @@
 Nov 2020        2.02.06
 ------------------------------------------------------------------------------
 
+substitute.c    Added support to call @function{} as @{function}{}.
+
+event.c         The SCREEN FOCUS event no longer requires #config mouse to
+                be enabled.
+
+math.c          % in #math now supports floating point modulo operations.
+
+data.c          #info will save #info variables to $info[VARIABLES] rather
+                than $info[VARIABLE]. Same for other lists.
+
+list.c          Added #list {var} filter {keep} {remove}. Keep and remove
+                must be a regex pattern, the keep regex is ignored if {} is
+                used, the remove regex is optional. #list indexate must be
+                used to filter tables.
+
 utf8.c          Added #config charset cp949
 
 Oct 2020        2.02.05

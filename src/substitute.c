@@ -950,11 +950,18 @@ int substitute(struct session *ses, char *string, char *result, int flags)
 						i++;
 					}
 
-					for (ptt = temp ; is_alnum(pti[i]) || pti[i] == '_' ; i++)
+					if (pti[i] == DEFAULT_OPEN)
 					{
-						*ptt++ = pti[i];
+						i = sub_arg_in_braces(ses, &pti[i], temp, GET_ONE, flags_neol) - pti;
 					}
-					*ptt = 0;
+					else
+					{
+						for (ptt = temp ; is_alnum(pti[i]) || pti[i] == '_' ; i++)
+						{
+							*ptt++ = pti[i];
+						}
+						*ptt = 0;
+					}
 
 					if (pti[i] != DEFAULT_OPEN)
 					{

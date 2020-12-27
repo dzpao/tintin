@@ -73,6 +73,7 @@ struct charset_type charset_table[] =
 {
 	{    "ASCII",         "iso-8859-1",  0                 },
 	{    "UTF-8",         "utf-8",       CHARSET_FLAG_UTF8 },
+	{    "BIG-5",         "big-5",       CHARSET_FLAG_BIG5 },
 	{    "GBK-1",         "gb18030",     CHARSET_FLAG_GBK1 },
 	{    "CP949",         "cp949",       CHARSET_FLAG_CP949 },
 
@@ -1055,7 +1056,7 @@ struct event_type event_table[] =
 	{    "SCREEN DESKTOP SIZE",                    0, EVENT_FLAG_SCREEN,   "SCREEN",    "called by #screen raise"    },
 	{    "SCREEN DIMENSIONS",                      0, EVENT_FLAG_SCREEN,   "SCREEN",    "called by #screen raise"    },
 	{    "SCREEN FILL",                            0, EVENT_FLAG_SCREEN,   "SCREEN",    "split bars are filled"      },
-	{    "SCREEN FOCUS",                           0, EVENT_FLAG_MOUSE,    "MOUSE",     "focus changes",             },
+	{    "SCREEN FOCUS",                           0, EVENT_FLAG_SCREEN,   "SCREEN",    "focus changes",             },
 	{    "SCREEN LOCATION",                        0, EVENT_FLAG_SCREEN,   "SCREEN",    "called by #screen raise"    },
 	{    "SCREEN MINIMIZED",                       0, EVENT_FLAG_SCREEN,   "SCREEN",    "called by #screen raise"    },
 	{    "SCREEN MOUSE LOCATION",                  0, EVENT_FLAG_MOUSE,    "MOUSE",     "called by #screen raise"    },

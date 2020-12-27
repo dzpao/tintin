@@ -48,7 +48,7 @@ DO_COMMAND(do_action)
 	{
 		if (*arg3 && (atof(arg3) < 1 || atof(arg3) >= 10))
 		{
-			show_error(ses, LIST_ACTION, "\e[1;31m#ERROR: #ACTION {%s} {..} {%s} SHOULD HAVE A PRIORITY BETWEEN 1.000 and 9.999.", arg1, arg3);
+			show_error(ses, LIST_ACTION, "\e[1;31m#WARNING: #ACTION {%s} {..} {%s} SHOULD HAVE A PRIORITY BETWEEN 1.000 and 9.999.", arg1, arg3);
 		}
 
 		update_node_list(ses->list[LIST_ACTION], arg1, arg2, arg3, "");

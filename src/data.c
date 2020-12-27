@@ -1022,7 +1022,7 @@ DO_COMMAND(do_message)
 				continue;
 			}
 
-			if (!is_abbrev(arg1, list_table[index].name) && !is_abbrev(arg1, list_table[index].name_multi) && strcasecmp(arg1, "ALL"))
+			if (!is_abbrev(arg1, list_table[index].name_multi) && strcasecmp(arg1, "ALL"))
 			{
 				continue;
 			}
@@ -1045,7 +1045,7 @@ DO_COMMAND(do_message)
 				
 				return ses;
 			}
-			show_message(ses, LIST_COMMAND, "#OK: #%s MESSAGES HAVE BEEN SET TO: %s.", list_table[index].name, HAS_BIT(ses->list[index]->flags, LIST_FLAG_MESSAGE) ? "ON" : "OFF");
+			show_message(ses, LIST_COMMAND, "#OK: #MESSAGE STATUS FOR %s HAS BEEN SET TO: %s.", list_table[index].name_multi, HAS_BIT(ses->list[index]->flags, LIST_FLAG_MESSAGE) ? "ON" : "OFF");
 
 			found = TRUE;
 		}
@@ -1089,7 +1089,7 @@ DO_COMMAND(do_ignore)
 				continue;
 			}
 
-			if (!is_abbrev(arg1, list_table[index].name) && !is_abbrev(arg1, list_table[index].name_multi) && strcasecmp(arg1, "ALL"))
+			if (!is_abbrev(arg1, list_table[index].name_multi) && strcasecmp(arg1, "ALL"))
 			{
 				continue;
 			}
@@ -1112,7 +1112,7 @@ DO_COMMAND(do_ignore)
 				
 				return ses;
 			}
-			show_message(ses, LIST_COMMAND, "#OK: #%s IGNORE STATUS HAS BEEN SET TO: %s.", list_table[index].name, HAS_BIT(ses->list[index]->flags, LIST_FLAG_IGNORE) ? "ON" : "OFF");
+			show_message(ses, LIST_COMMAND, "#OK: #IGNORE STATUS FOR %s HAS BEEN SET TO: %s.", list_table[index].name_multi, HAS_BIT(ses->list[index]->flags, LIST_FLAG_IGNORE) ? "ON" : "OFF");
 
 			found = TRUE;
 		}
@@ -1156,7 +1156,7 @@ DO_COMMAND(do_debug)
 				continue;
 			}
 
-			if (!is_abbrev(arg1, list_table[index].name) && !is_abbrev(arg1, list_table[index].name_multi) && strcasecmp(arg1, "ALL"))
+			if (!is_abbrev(arg1, list_table[index].name_multi) && strcasecmp(arg1, "ALL"))
 			{
 				continue;
 			}
@@ -1184,7 +1184,7 @@ DO_COMMAND(do_debug)
 				
 				return ses;
 			}
-			show_message(ses, LIST_COMMAND, "#OK: #%s DEBUG STATUS HAS BEEN SET TO: %s.", list_table[index].name, is_abbrev(arg2, "LOG") ? "LOG" : HAS_BIT(ses->list[index]->flags, LIST_FLAG_DEBUG) ? "ON" : "OFF");
+			show_message(ses, LIST_COMMAND, "#OK: #DEBUG STATUS FOR %s HAS BEEN SET TO: %s.", list_table[index].name_multi, is_abbrev(arg2, "LOG") ? "LOG" : HAS_BIT(ses->list[index]->flags, LIST_FLAG_DEBUG) ? "ON" : "OFF");
 
 			found = TRUE;
 		}
@@ -1235,7 +1235,7 @@ DO_COMMAND(do_info)
 				continue;
 			}
 
-			if (!is_abbrev(arg1, list_table[index].name) && !is_abbrev(arg1, list_table[index].name_multi) && strcasecmp(arg1, "ALL"))
+			if (!is_abbrev(arg1, list_table[index].name_multi) && strcasecmp(arg1, "ALL"))
 			{
 				continue;
 			}
@@ -1260,22 +1260,22 @@ DO_COMMAND(do_info)
 				{
 					for (cnt = 0 ; cnt < root->used ; cnt++)
 					{
-						tintin_printf2(ses, "#INFO %s %4d {arg1}{%s} {arg2}{%s} {arg3}{%s} {arg4}{%s} {class}{%s} {shots}{%u}", list_table[index].name, cnt+1, root->list[cnt]->arg1, root->list[cnt]->arg2, root->list[cnt]->arg3, root->list[cnt]->arg4, root->list[cnt]->group, root->list[cnt]->shots);
+						tintin_printf2(ses, "#INFO %s %4d {arg1}{%s} {arg2}{%s} {arg3}{%s} {arg4}{%s} {class}{%s} {shots}{%u}", list_table[index].name_multi, cnt+1, root->list[cnt]->arg1, root->list[cnt]->arg2, root->list[cnt]->arg3, root->list[cnt]->arg4, root->list[cnt]->group, root->list[cnt]->shots);
 					}
 				}
 				else if (is_abbrev(arg2, "SAVE"))
 				{
-					sprintf(name, "info[%s]", list_table[index].name);
+					sprintf(name, "info[%s]", list_table[index].name_multi);
 
 					set_nest_node_ses(ses, name, "");
 
 					for (cnt = 0 ; cnt < root->used ; cnt++)
 					{
-						sprintf(name, "info[%s][%d]", list_table[index].name, cnt + 1);
+						sprintf(name, "info[%s][%d]", list_table[index].name_multi, cnt + 1);
 
 						set_nest_node_ses(ses, name, "{arg1}{%s}{arg2}{%s}{arg3}{%s}{arg4}{%s}{class}{%s}{nest}{%d}{shots}{%u}", root->list[cnt]->arg1, root->list[cnt]->arg2, root->list[cnt]->arg3, root->list[cnt]->arg4, root->list[cnt]->group, root->list[cnt]->root ? root->list[cnt]->root->used : 0, root->list[cnt]->shots);
 					}
-					show_message(ses, LIST_COMMAND, "#INFO: DATA WRITTEN TO {info[%s]}", list_table[index].name);
+					show_message(ses, LIST_COMMAND, "#INFO: DATA WRITTEN TO {info[%s]}", list_table[index].name_multi);
 				}
 				else
 				{
@@ -1283,7 +1283,7 @@ DO_COMMAND(do_info)
 				}
 				return ses;
 			}
-			show_message(ses, LIST_COMMAND, "#OK: #%s INFO STATUS HAS BEEN SET TO: %s.", list_table[index].name, HAS_BIT(ses->list[index]->flags, LIST_FLAG_INFO) ? "ON" : "OFF");
+			show_message(ses, LIST_COMMAND, "#OK: #INFO STATUS FOR %s HAS BEEN SET TO: %s.", list_table[index].name_multi, HAS_BIT(ses->list[index]->flags, LIST_FLAG_INFO) ? "ON" : "OFF");
 
 			found = TRUE;
 		}

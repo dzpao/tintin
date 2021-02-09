@@ -703,7 +703,7 @@ DO_CONFIG(config_randomseed)
 	{
 		if (is_abbrev(arg2, "AUTO"))
 		{
-			seed_rand(ses, utime());
+			seed_rand(ses, ++gtd->utime);
 		}
 		else if (is_number(arg2))
 		{

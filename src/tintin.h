@@ -132,8 +132,13 @@
 #define SORT_PRIORITY                    0
 #define SORT_ALPHA                       1
 #define SORT_ALNUM                       2
-#define SORT_APPEND                      3
-#define SORT_DELAY                       4
+#define SORT_STABLE                      3
+#define SORT_APPEND                      4
+#define SORT_DELAY                       5
+
+#define SEEK_MATCH                       0
+#define SEEK_SWITCH                      1
+#define SEEK_APPEND                      2
 
 #define DEFAULT_OPEN                   '{'
 #define DEFAULT_CLOSE                  '}'
@@ -2791,6 +2796,7 @@ extern  int valid_escape(struct session *ses, char *arg);
 extern char *fuzzy_color_code(struct session *ses, char *pti);
 extern char *dim_color_code(struct session *ses, char *pti, int mod);
 extern char *lit_color_code(struct session *ses, char *pti, int mod);
+extern int color_gradient(char *pti, int low, int max);
 extern int is_color_code(char *str);
 extern int is_color_name(char *str);
 extern int substitute_color(char *input, char *output, int colors);

@@ -1478,7 +1478,7 @@ void format_string(struct session *ses, char *format, char *arg, char *out)
 						break;
 
 					case 'U':
-						sprintf(arglist[i], "%lld", utime());
+						sprintf(arglist[i], "%lld", ++gtd->utime);
 						break;
 
 					case 'X':

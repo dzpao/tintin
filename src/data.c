@@ -53,7 +53,7 @@ void kill_list(struct listroot *root)
 	{
 		delete_index_list(root, root->used - 1);
 	}
-//	root->update = 0;
+	root->update = 0;
 }
 
 void free_list(struct listroot *root)
@@ -173,7 +173,7 @@ struct listnode *create_node_list(struct listroot *root, char *arg1, char *arg2,
 			break;
 
 		case LIST_TICKER:
-			node->val64 = gtd->utime + (long long) get_number(root->ses, node->arg3) * 1000000LL;
+			node->val64 = gtd->utime + (long long) tintoi(arg3) * 1000000.0;
 
 			if (node->val64 < gtd->utime_next_tick)
 			{
@@ -241,7 +241,7 @@ struct listnode *update_node_list(struct listroot *root, char *arg1, char *arg2,
 		switch (root->type)
 		{
 			case LIST_TICKER:
-				node->val64 = gtd->utime + (long long) get_number(root->ses, node->arg3) * 1000000LL;
+				node->val64 = gtd->utime + (long long) tintoi(arg3) * 1000000;
 
 				if (node->val64 < gtd->utime_next_tick)
 				{
@@ -286,6 +286,7 @@ struct listnode *update_node_list(struct listroot *root, char *arg1, char *arg2,
 
 			case SORT_ALPHA:
 			case SORT_ALNUM:
+			case SORT_STABLE:
 				break;
 
 			default:
@@ -413,6 +414,7 @@ struct listnode *search_node_list(struct listroot *root, char *text)
 	switch (list_table[root->type].mode)
 	{
 		case SORT_ALPHA:
+		case SORT_STABLE:
 			index = bsearch_alpha_list(root, text, 0);
 			break;
 
@@ -444,6 +446,7 @@ int search_index_list(struct listroot *root, char *text, char *priority)
 	switch (list_table[root->type].mode)
 	{
 		case SORT_ALPHA:
+		case SORT_STABLE:
 			return bsearch_alpha_list(root, text, 0);
 		
 		case SORT_ALNUM:
@@ -472,59 +475,98 @@ int locate_index_list(struct listroot *root, char *text, char *priority)
 	switch (list_table[root->type].mode)
 	{
 		case SORT_ALPHA:
-			return bsearch_alpha_list(root, text, 1);
+			return bsearch_alpha_list(root, text, SEEK_SWITCH);
+
+		case SORT_STABLE:
+			return bsearch_alpha_list(root, text, SEEK_APPEND);
 
 		case SORT_ALNUM:
-			return bsearch_alnum_list(root, text, 1);
+			return bsearch_alnum_list(root, text, SEEK_SWITCH);
 
 		case SORT_DELAY:
-			return bsearch_priority_list(root, text, text, 1);
+			return bsearch_priority_list(root, text, text, SEEK_SWITCH);
 
 		case SORT_PRIORITY:
-			return bsearch_priority_list(root, text, priority, 1);
+			return bsearch_priority_list(root, text, priority, SEEK_SWITCH);
 
 		default:
 			return root->used;
 	}
 }
 
-
 int bsearch_alpha_list(struct listroot *root, char *text, int seek)
 {
-        int bot, top, val, srt;
+	int bot, mid, top;
 
-        bot = 0;
-        top = root->used - 1;
-        val = top;
+	if (root->used == 0)
+	{
+		return seek ? 0 : -1;
+	}
 
-        while (bot <= top)
-        {
-                srt = strcmp(text, root->list[val]->arg1);
+	bot = 0;
+	top = root->used;
 
-                if (srt == 0)
-                {
-                        return val;
-                }
+	while (top > 1)
+	{
+		mid = top / 2;
 
-                if (srt < 0)
-                {
-                        top = val - 1;
-                }
-                else
-                {
-                        bot = val + 1;
-                }
+		if (strcmp(text, root->list[bot + mid]->arg1) >= 0)
+		{
+			bot += mid;
+		}
+		top -= mid;
+	}
 
-                val = bot + (top - bot) / 2;
-        }
+	if (strcmp(text, root->list[bot]->arg1) == 0)
+	{
+		return bot + (seek == SEEK_APPEND);
+	}
 
-        if (seek)
-        {
-                return UMAX(0, val);
-        }
-        return -1;
+	if (seek)
+	{
+		return bot += strcmp(text, root->list[bot]->arg1) > 0;
+	}
+
+	return -1;
 }
 
+/*
+int bsearch_alpha_list(struct listroot *root, char *text, int seek)
+{
+	int bot, top, val, srt;
+
+	bot = 0;
+	top = root->used - 1;
+	val = top;
+
+	while (bot <= top)
+	{
+		srt = strcmp(text, root->list[val]->arg1);
+
+		if (srt == 0)
+		{
+			return val;
+		}
+
+		if (srt < 0)
+		{
+			top = val - 1;
+		}
+		else
+		{
+			bot = val + 1;
+		}
+
+		val = bot + (top - bot) / 2;
+	}
+
+	if (seek)
+	{
+		return UMAX(0, val);
+	}
+	return -1;
+}
+*/
 
 int bsearch_alnum_list(struct listroot *root, char *text, int seek)
 {
@@ -776,6 +818,7 @@ int show_node_with_wild(struct session *ses, char *text, struct listroot *root)
 	switch (list_table[root->type].mode)
 	{
 		case SORT_ALPHA:
+		case SORT_STABLE:
 			index = bsearch_alpha_list(root, text, 0);
 			break;
 
@@ -885,6 +928,7 @@ int delete_node_with_wild(struct session *ses, int type, char *text)
 	switch (list_table[type].mode)
 	{
 		case SORT_ALPHA:
+		case SORT_STABLE:
 			index = bsearch_alpha_list(root, arg1, 0);
 			break;
 

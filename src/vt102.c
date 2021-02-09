@@ -1301,7 +1301,7 @@ int catch_vt102_codes(struct session *ses, unsigned char *str, int cplen)
 								pop_call();
 								return len + 1;
 							}
-							break;
+							goto end;
 
 						case 'H':
 							if (check_all_events(ses, EVENT_FLAG_CATCH, 0, 2, "CATCH VT100 CURSOR H", ntos(val[0]), ntos(val[1])))
@@ -1309,7 +1309,7 @@ int catch_vt102_codes(struct session *ses, unsigned char *str, int cplen)
 								pop_call();
 								return len + 1;
 							}
-							break;
+							goto end;
 
 						case 'J':
 							if (val[0] == 0)
@@ -1344,7 +1344,7 @@ int catch_vt102_codes(struct session *ses, unsigned char *str, int cplen)
 									return len + 1;
 								}
 							}
-							break;
+							goto end;
 
 						case 'K':
 							if (val[0] == 0)
@@ -1371,7 +1371,7 @@ int catch_vt102_codes(struct session *ses, unsigned char *str, int cplen)
 									return len + 1;
 								}
 							}
-							break;
+							goto end;
 
 						case 'Z':
 							check_all_events(ses, EVENT_FLAG_VT100, 0, 0, "VT100 DECID");
@@ -1379,8 +1379,7 @@ int catch_vt102_codes(struct session *ses, unsigned char *str, int cplen)
 							return len + 1;
 
 						default:
-							pop_call();
-							return 0;
+							goto end;
 					}
 				}
 			}
@@ -1405,8 +1404,7 @@ int catch_vt102_codes(struct session *ses, unsigned char *str, int cplen)
 							return 11;
 						}
 					}
-					pop_call();
-					return 0;
+					goto end;
 				}
 				else
 				{
@@ -1458,6 +1456,9 @@ int catch_vt102_codes(struct session *ses, unsigned char *str, int cplen)
 			}
 			break;
 	}
+
+	end:
+
 	pop_call();
 	return 0;
 }

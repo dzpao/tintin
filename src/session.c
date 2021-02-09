@@ -205,7 +205,7 @@ DO_COMMAND(do_zap)
 
 		if (sesptr == NULL)
 		{
-			show_error(ses, LIST_COMMAND, "#ZAP: THERE'S NO SESSION WITH THAT NAME!");
+			show_error(ses, LIST_COMMAND, "#ZAP: THERE'S NO SESSION NAMED {%s}", arg1);
 
 			pop_call();
 			return ses;
@@ -235,7 +235,10 @@ DO_COMMAND(do_zap)
 		pop_call();
 		return gtd->ses;
 	}
+
 	cleanup_session(sesptr);
+
+	show_message(ses, LIST_COMMAND, "#ZAP: SESSION {%s} HAS BEEN ZAPPED.", sesptr->name);
 
 	pop_call();
 	return ses;
@@ -304,6 +307,8 @@ struct session *activate_session(struct session *ses)
 {
 	check_all_events(gtd->ses, EVENT_FLAG_SESSION, 0, 2, "SESSION DEACTIVATED", gtd->ses->name, ses->name);
 
+	gtd->ses = ses;
+
 	dirty_screen(ses);
 
 	if (!check_all_events(ses, EVENT_FLAG_GAG, 0, 2, "GAG SESSION ACTIVATED", ses->name, gtd->ses->name))
@@ -312,8 +317,6 @@ struct session *activate_session(struct session *ses)
 	}
 
 	check_all_events(ses, EVENT_FLAG_SESSION, 0, 2, "SESSION ACTIVATED", ses->name, gtd->ses->name);
-
-	gtd->ses = ses;
 
 	return ses;
 }
@@ -391,7 +394,7 @@ struct session *new_session(struct session *ses, char *name, char *arg, int desc
 	newses->logname        = strdup("");
 	newses->lognext_name   = strdup("");
 	newses->logline_name   = strdup("");
-	newses->rand           = utime();
+	newses->rand           = ++gtd->utime;
 
 	newses->more_output    = str_dup("");
 
@@ -527,7 +530,7 @@ struct session *connect_session(struct session *ses)
 
 	push_call("connect_session(%p)",ses);
 
-	ses->connect_retry = utime() + gts->connect_retry;
+	ses->connect_retry = ++gtd->time + gts->connect_retry;
 
 	reconnect:
 
@@ -568,7 +571,7 @@ struct session *connect_session(struct session *ses)
 		return ses;
 	}
 
-	if (ses->connect_retry > utime())
+	if (ses->connect_retry > gtd->utime)
 	{
 		fd_set readfds;
 
@@ -581,7 +584,7 @@ struct session *connect_session(struct session *ses)
 			{
 				to.tv_sec = 1;
 
-				tintin_printf(ses, "#SESSION '%s' FAILED TO CONNECT. RETRYING FOR %d SECONDS.", ses->name, (ses->connect_retry - utime()) / 1000000);
+				tintin_printf(ses, "#SESSION '%s' FAILED TO CONNECT. RETRYING FOR %d SECONDS.", ses->name, (ses->connect_retry - gtd->utime) / 1000000);
 			}
 
 			goto reconnect;
